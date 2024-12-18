@@ -1,11 +1,10 @@
 package com.konrad.smartfinance.dto;
 
-import com.konrad.smartfinance.model.Currency;
-import com.konrad.smartfinance.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,21 +14,21 @@ public class ExpanseDto {
 
     private Long id;
 
-    private User user;
+    private UserDto user;
 
     private String name;
 
     private String description;
 
-    private Currency currency;
+    private CurrencyDto currency;
 
-    private double amount;
+    private BigDecimal amount;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    public ExpanseDto(User user, String name, String description, Currency currency, double amount) {
+    public ExpanseDto(UserDto user, String name, String description, CurrencyDto currency, BigDecimal amount) {
         this.user = user;
         this.name = name;
         this.description = description;

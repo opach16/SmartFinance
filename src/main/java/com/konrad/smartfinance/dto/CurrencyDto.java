@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,11 +15,11 @@ public class CurrencyDto {
     private Long id;
     private String symbol;
     private String name;
-    private String price;
+    private BigDecimal price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public CurrencyDto(String symbol, String name, String price) {
+    public CurrencyDto(String symbol, String name, BigDecimal price) {
         this.symbol = symbol;
         this.name = name;
         this.price = price;

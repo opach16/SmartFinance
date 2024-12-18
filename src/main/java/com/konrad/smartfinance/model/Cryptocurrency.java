@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -33,7 +34,7 @@ public class Cryptocurrency {
 
     @NotNull
     @Column(name = "PRICE")
-    private String price;
+    private BigDecimal price;
 
     @NotNull
     @Column(name = "CREATED_AT")

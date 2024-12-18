@@ -13,15 +13,15 @@ import java.time.LocalDateTime;
 public class AccountDto {
 
     private Long id;
-    private Long userId;
+    private UserDto user;
     private String mainCurrency;
     private BigDecimal mainBalance;
     private BigDecimal totalBalance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public AccountDto(Long userId, String mainCurrency, BigDecimal mainBalance, BigDecimal totalBalance) {
-        this.userId = userId;
+    public AccountDto(UserDto user, String mainCurrency, BigDecimal mainBalance, BigDecimal totalBalance) {
+        this.user = user;
         this.mainCurrency = mainCurrency;
         this.mainBalance = mainBalance;
     }

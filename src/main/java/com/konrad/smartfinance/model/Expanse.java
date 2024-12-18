@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -39,7 +40,7 @@ public class Expanse {
 
     @NotNull
     @Column(name = "AMOUNT")
-    private double amount;
+    private BigDecimal amount;
 
     @NotNull
     @Column(name = "CREATED_AT")
