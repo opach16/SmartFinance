@@ -23,13 +23,15 @@ public class Account {
     @Column(name="ID", nullable = false, updatable = false, unique = true)
     private Long id;
 
+    @NotNull
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
 
     @NotNull
-    @Column(name="MAIN_CURRENCY")
-    private String mainCurrency;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="MAIN_CURRENCY_ID")
+    private Currency mainCurrency;
 
     @NotNull
     @Column(name="MAIN_BALANCE")
