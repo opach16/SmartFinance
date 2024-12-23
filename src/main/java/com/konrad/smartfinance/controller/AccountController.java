@@ -1,11 +1,9 @@
 package com.konrad.smartfinance.controller;
 
+import com.konrad.smartfinance.domain.dto.AccountTransactionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,13 +24,33 @@ public class AccountController {
         return ResponseEntity.ok(BigDecimal.ZERO);
     }
 
-    @GetMapping(value ="/expenses/{id}")
+    @GetMapping(value = "/expenses/{id}")
     public ResponseEntity<List> getExpansesList(@PathVariable Long id) {
         return ResponseEntity.ok(new ArrayList<>());
+    }
+
+    @PostMapping(value = "/expanses")
+    public ResponseEntity<AccountTransactionDto> addExpanse(@RequestBody AccountTransactionDto accountTransactionDto) {
+        return ResponseEntity.ok(accountTransactionDto);
+    }
+
+    @PutMapping(value = "/expanses")
+    public ResponseEntity<AccountTransactionDto> updateExpense(@RequestBody AccountTransactionDto accountTransactionDto) {
+        return ResponseEntity.ok(accountTransactionDto);
     }
 
     @GetMapping(value = "/incomes/{id}")
     public ResponseEntity<List> getIncomesList(@PathVariable Long id) {
         return ResponseEntity.ok(new ArrayList<>());
+    }
+
+    @PostMapping(value = "/incomes")
+    public ResponseEntity<AccountTransactionDto> addIncome(@RequestBody AccountTransactionDto accountTransactionDto) {
+        return ResponseEntity.ok(accountTransactionDto);
+    }
+
+    @PutMapping(value = "/incomes")
+    public ResponseEntity<AccountTransactionDto> updateIncome(@RequestBody AccountTransactionDto accountTransactionDto) {
+        return ResponseEntity.ok(accountTransactionDto);
     }
 }
