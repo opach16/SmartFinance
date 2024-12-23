@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.dto;
+package com.konrad.smartfinance.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

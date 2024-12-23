@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.model;
+package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -16,31 +16,27 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "EXPANSES")
-public class Expanse {
+@Table(name = "ACCOUNT")
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    @Column(name = "EXPANSE_NAME")
-    private String name;
-
-    @Column(name = "DESCRIPTION")
-    private String description;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENCY_ID")
-    private Currency currency;
+    @JoinColumn(name = "MAIN_CURRENCY_ID")
+    private Currency mainCurrency;
 
-    @NotNull
-    @Column(name = "AMOUNT")
-    private BigDecimal amount;
+    @Column(name = "MAIN_BALANCE")
+    private BigDecimal mainBalance;
+
+    @Column(name = "TOTAL_BALANCE")
+    private BigDecimal totalBalance;
 
     @NotNull
     @Column(name = "CREATED_AT")
@@ -49,8 +45,20 @@ public class Expanse {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
+    public Account(User user, Currency mainCurrency) {
+        this.user = user;
+        this.mainCurrency = mainCurrency;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        mainBalance = new BigDecimal("0.00");
+        totalBalance = new BigDecimal("0.00");
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 }

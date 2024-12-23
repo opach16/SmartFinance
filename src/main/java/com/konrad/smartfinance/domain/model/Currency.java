@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.model;
+package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -16,8 +16,8 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "CRYPTOCURRENCIES")
-public class Cryptocurrency {
+@Table(name="CURRENCIES")
+public class Currency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +43,19 @@ public class Cryptocurrency {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
+    public Currency(String symbol, String name, BigDecimal price) {
+        this.symbol = symbol;
+        this.name = name;
+        this.price = price;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
 }

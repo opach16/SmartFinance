@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.dto;
+package com.konrad.smartfinance.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExpanseDto {
+public class AccountTransactionDto {
 
     private Long id;
 
@@ -28,7 +28,7 @@ public class ExpanseDto {
 
     private LocalDateTime updatedAt;
 
-    public ExpanseDto(UserDto user, String name, String description, CurrencyDto currency, BigDecimal amount) {
+    public AccountTransactionDto(UserDto user, String name, String description, CurrencyDto currency, BigDecimal amount) {
         this.user = user;
         this.name = name;
         this.description = description;
