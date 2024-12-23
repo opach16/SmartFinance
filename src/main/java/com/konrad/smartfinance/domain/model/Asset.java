@@ -1,5 +1,7 @@
-package com.konrad.smartfinance.model;
+package com.konrad.smartfinance.domain.model;
 
+
+import com.konrad.smartfinance.domain.AssetType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,8 +18,8 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "INCOMES")
-public class Income {
+@Table(name = "ASSETS")
+public class Asset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,22 +27,24 @@ public class Income {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
-    private User user;
+    @JoinColumn(name = "ACCOUNT_ID")
+    private Account account;
 
-    @Column(name = "INCOME_NAME")
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ASSET_TYPE")
+    private AssetType assetType;
+
+    @NotNull
+    @Column(name = "NAME")
     private String name;
-
-    @Column(name = "DESCRIPTION")
-    private String description;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENCY_ID")
-    private Currency currency;
 
     @NotNull
     @Column(name = "AMOUNT")
     private BigDecimal amount;
+
+    @Column(name = "CURRENT_VALUE")
+    private BigDecimal currentValue;
 
     @NotNull
     @Column(name = "CREATED_AT")
@@ -52,5 +56,10 @@ public class Income {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 }
