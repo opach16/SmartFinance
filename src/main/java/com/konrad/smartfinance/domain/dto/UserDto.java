@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.dto;
+package com.konrad.smartfinance.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,8 +15,6 @@ public class UserDto {
     private String username;
     private String email;
     private String password;
-    private String accessKey;
-    private LocalDateTime accessKeyExpiryTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

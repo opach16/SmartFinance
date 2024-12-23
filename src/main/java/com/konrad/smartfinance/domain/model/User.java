@@ -1,4 +1,4 @@
-package com.konrad.smartfinance.model;
+package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -51,5 +51,10 @@ public class User {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }
