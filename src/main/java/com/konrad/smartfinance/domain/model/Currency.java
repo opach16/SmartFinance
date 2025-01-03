@@ -2,15 +2,13 @@ package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,10 +27,6 @@ public class Currency {
     private String symbol;
 
     @NotNull
-    @Column(name = "NAME", unique = true)
-    private String name;
-
-    @NotNull
     @Column(name = "PRICE")
     private BigDecimal price;
 
@@ -43,9 +37,8 @@ public class Currency {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    public Currency(String symbol, String name, BigDecimal price) {
+    public Currency(String symbol, BigDecimal price) {
         this.symbol = symbol;
-        this.name = name;
         this.price = price;
     }
 
