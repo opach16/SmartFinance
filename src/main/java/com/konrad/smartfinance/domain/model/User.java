@@ -2,14 +2,12 @@ package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -55,6 +53,6 @@ public class User {
 
     @PreUpdate
     public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 }
