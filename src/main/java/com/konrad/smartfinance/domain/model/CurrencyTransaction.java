@@ -3,16 +3,14 @@ package com.konrad.smartfinance.domain.model;
 import com.konrad.smartfinance.domain.CurrencyTransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -57,6 +55,15 @@ public class CurrencyTransaction {
 
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+
+    public CurrencyTransaction(User user, Currency currency, CurrencyTransactionType currencyTransactionType, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
+        this.user = user;
+        this.currency = currency;
+        this.currencyTransactionType = currencyTransactionType;
+        this.amount = amount;
+        this.price = price;
+        this.transactionDate = transactionDate;
+    }
 
     @PrePersist
     protected void onCreate() {
