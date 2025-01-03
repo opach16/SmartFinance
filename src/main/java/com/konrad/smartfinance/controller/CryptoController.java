@@ -1,6 +1,9 @@
 package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.CryptocurrencyDto;
+import com.konrad.smartfinance.exception.CryptocurrencyException;
+import com.konrad.smartfinance.mapper.CryptocurrencyMapper;
+import com.konrad.smartfinance.service.CryptocurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +20,21 @@ import java.util.List;
 @RequestMapping("/api/v1/crypto")
 public class CryptoController {
 
+    private final CryptocurrencyService cryptocurrencyService;
+    private final CryptocurrencyMapper cryptocurrencyMapper;
+
     @GetMapping
     public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrencies() {
-        return ResponseEntity.ok().body(new ArrayList<CryptocurrencyDto>());
+        return ResponseEntity.ok().body(cryptocurrencyMapper.mapToCryptocurrencyDtoList(cryptocurrencyService.getAll()));
     }
 
     @GetMapping("/{symbol}")
-    public ResponseEntity<CryptocurrencyDto> getCryptocurrenciesByUserId(@PathVariable String symbol) {
-        return ResponseEntity.ok().body(new CryptocurrencyDto("test", "test", new BigDecimal("15")));
+    public ResponseEntity<CryptocurrencyDto> getCryptocurrenciesByUserId(@PathVariable String symbol) throws CryptocurrencyException {
+        return ResponseEntity.ok().body(cryptocurrencyMapper.mapToCryptocurrencyDto(cryptocurrencyService.getBySymbol(symbol)));
     }
 
     @GetMapping("/{symbol}/price")
-    public ResponseEntity<BigDecimal> getPriceBySymbol(@PathVariable String symbol) {
-        return ResponseEntity.ok().body(new BigDecimal("50.15"));
+    public ResponseEntity<BigDecimal> getPriceBySymbol(@PathVariable String symbol) throws CryptocurrencyException {
+        return ResponseEntity.ok().body(cryptocurrencyService.getPrice(symbol));
     }
 }
