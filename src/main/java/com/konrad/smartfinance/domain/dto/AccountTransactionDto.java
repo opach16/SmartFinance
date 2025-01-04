@@ -1,38 +1,37 @@
 package com.konrad.smartfinance.domain.dto;
 
+import com.konrad.smartfinance.domain.AccountTransactionType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountTransactionDto {
 
     private Long id;
-
     private UserDto user;
-
+    private AccountTransactionType transactionType;
     private String name;
-
-    private String description;
-
     private CurrencyDto currency;
-
     private BigDecimal amount;
-
+    private LocalDate transactionDate;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
-    public AccountTransactionDto(UserDto user, String name, String description, CurrencyDto currency, BigDecimal amount) {
+    public AccountTransactionDto(UserDto user, AccountTransactionType transactionType, String name, CurrencyDto currency, BigDecimal amount, LocalDate transactionDate) {
         this.user = user;
+        this.transactionType = transactionType;
         this.name = name;
-        this.description = description;
         this.currency = currency;
         this.amount = amount;
+        this.transactionDate = transactionDate;
     }
 }

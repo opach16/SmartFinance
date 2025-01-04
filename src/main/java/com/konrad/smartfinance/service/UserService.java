@@ -1,11 +1,15 @@
 package com.konrad.smartfinance.service;
 
+import com.konrad.smartfinance.domain.model.Account;
+import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.User;
+import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -15,6 +19,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AccountService accountService;
+    private final CurrencyService currencyService;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -25,8 +31,11 @@ public class UserService {
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
     }
 
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption {
+        Currency mainCurrency = currencyService.getCurrencyBySymbol(mainCurrencySymbol);
+        User fetchedUser = userRepository.save(user);
+        accountService.createAccount(new Account(fetchedUser, mainCurrency, mainBalance));
+        return fetchedUser;
     }
 
     public User updateUser(Long id, User user) throws UserException {

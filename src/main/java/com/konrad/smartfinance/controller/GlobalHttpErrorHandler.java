@@ -1,9 +1,6 @@
 package com.konrad.smartfinance.controller;
 
-import com.konrad.smartfinance.exception.CryptocurrencyException;
-import com.konrad.smartfinance.exception.CurrencyExeption;
-import com.konrad.smartfinance.exception.CurrencyTransactionException;
-import com.konrad.smartfinance.exception.UserException;
+import com.konrad.smartfinance.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +26,16 @@ public class GlobalHttpErrorHandler {
 
     @ExceptionHandler(CryptocurrencyException.class)
     public ResponseEntity<Object> handlerCryptocurrencyException(CryptocurrencyException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CryptoTransactionException.class)
+    public ResponseEntity<Object> handlerCryptoTransactionException(CryptoTransactionException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccountException.class)
+    public ResponseEntity<Object> handlerAccountException(AccountException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

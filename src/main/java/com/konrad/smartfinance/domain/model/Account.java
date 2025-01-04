@@ -2,15 +2,13 @@ package com.konrad.smartfinance.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,10 +18,10 @@ import java.time.temporal.ChronoUnit;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false, updatable = false, unique = true)
     private Long id;
 
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
@@ -45,16 +43,16 @@ public class Account {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    public Account(User user, Currency mainCurrency) {
+    public Account(User user, Currency mainCurrency, BigDecimal mainBalance) {
         this.user = user;
         this.mainCurrency = mainCurrency;
+        this.mainBalance = mainBalance;
+        this.totalBalance = mainBalance;
     }
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        mainBalance = new BigDecimal("0.00");
-        totalBalance = new BigDecimal("0.00");
     }
 
     @PreUpdate
