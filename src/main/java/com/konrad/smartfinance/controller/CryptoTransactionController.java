@@ -1,8 +1,10 @@
 package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.CryptoTransactionDto;
+import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
 import com.konrad.smartfinance.domain.model.CryptoTransaction;
 import com.konrad.smartfinance.exception.CryptoTransactionException;
+import com.konrad.smartfinance.exception.CryptocurrencyException;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.CryptoTransactionMapper;
 import com.konrad.smartfinance.service.CryptoTransactionService;
@@ -21,28 +23,32 @@ public class CryptoTransactionController {
     private final CryptoTransactionMapper cryptoTransactionMapper;
 
     @GetMapping
-    public ResponseEntity<List<CryptoTransactionDto>> getAllCryptoTransactions() {
+    public ResponseEntity<List<CryptoTransactionDto>> getAllTransactions() {
         return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDtoList(cryptoTransactionService.getAllTransactions()));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<CryptoTransactionDto>> getCryptoTransactionsByUserId(@PathVariable Long userId) throws UserException {
+    @GetMapping("{id}")
+    public ResponseEntity<CryptoTransactionDto> getTransactionById(@PathVariable Long id) throws CryptoTransactionException {
+        return ResponseEntity.ok().body(cryptoTransactionMapper
+                .mapToCryptoTransactionDto(cryptoTransactionService.getTransactionById(id)));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CryptoTransactionDto>> getTransactionsByUserId(@PathVariable Long userId) throws UserException {
         return ResponseEntity.ok().body(cryptoTransactionMapper
                 .mapToCryptoTransactionDtoList(cryptoTransactionService.getTransactionsByUserId(userId)));
     }
 
     @PostMapping
-    public ResponseEntity<CryptoTransactionDto> addCryptoTransaction(@RequestBody CryptoTransactionDto transactionDto) {
-        CryptoTransaction transaction = cryptoTransactionMapper.mapToCryptoTransaction(transactionDto);
-        return ResponseEntity.ok().body(cryptoTransactionMapper
-                .mapToCryptoTransactionDto(cryptoTransactionService.addTransaction(transaction)));
+    public ResponseEntity<CryptoTransactionDto> addTransaction(@RequestBody CryptoTransactionRequest request) throws CryptocurrencyException, UserException {
+        CryptoTransaction transaction = cryptoTransactionService.addTransaction(request);
+        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CryptoTransactionDto> updateCryptoTransaction(@PathVariable Long id, @RequestBody CryptoTransactionDto transactionDto) throws CryptoTransactionException {
-        CryptoTransaction transaction = cryptoTransactionMapper.mapToCryptoTransaction(transactionDto);
-        return ResponseEntity.ok().body(cryptoTransactionMapper
-                .mapToCryptoTransactionDto(cryptoTransactionService.updateTransaction(id, transaction)));
+    public ResponseEntity<CryptoTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException {
+        CryptoTransaction transaction = cryptoTransactionService.updateTransaction(id, request);
+        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,11 @@
 package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
+import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
+import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.CurrencyTransactionException;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.CurrencyTransactionMapper;
 import com.konrad.smartfinance.service.CurrencyTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -25,28 +28,27 @@ public class CurrencyTransactionController {
                 .mapToCurrencyTransactionDtoList(currencyTransactionService.getAllTransactions()));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<CurrencyTransactionDto>> getTransactionsByUserId(@PathVariable Long userId) throws CurrencyTransactionException {
-        return ResponseEntity.ok().body(currencyTransactionMapper
-                .mapToCurrencyTransactionDtoList(currencyTransactionService.getTransactionByUserId(userId)));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<CurrencyTransactionDto> getTransactionById(@PathVariable Long id) throws CurrencyTransactionException {
         return ResponseEntity.ok().body(currencyTransactionMapper
                 .mapToCurrencyTransactionDto(currencyTransactionService.getTransactionById(id)));
     }
 
-    @PostMapping
-    public ResponseEntity<CurrencyTransactionDto> addTransaction(@RequestBody CurrencyTransactionDto transactionDto) {
-        CurrencyTransaction transaction = currencyTransactionMapper.mapToCurrencyTransactionEntity(transactionDto);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CurrencyTransactionDto>> getTransactionsByUserId(@PathVariable Long userId) throws UserException {
         return ResponseEntity.ok().body(currencyTransactionMapper
-                .mapToCurrencyTransactionDto(currencyTransactionService.addTransaction(transaction)));
+                .mapToCurrencyTransactionDtoList(currencyTransactionService.getTransactionByUserId(userId)));
+    }
+
+    @PostMapping
+    public ResponseEntity<CurrencyTransactionDto> addTransaction(@RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, UserException {
+        CurrencyTransaction transaction = currencyTransactionService.addTransaction(request);
+        return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionDto(transaction));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CurrencyTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CurrencyTransactionDto transactionDto) throws CurrencyTransactionException {
-        CurrencyTransaction transaction = currencyTransactionService.updateTransaction(id, currencyTransactionMapper.mapToCurrencyTransactionEntity(transactionDto));
+    public ResponseEntity<CurrencyTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption {
+        CurrencyTransaction transaction = currencyTransactionService.updateTransaction(id, request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionDto(transaction));
     }
 
