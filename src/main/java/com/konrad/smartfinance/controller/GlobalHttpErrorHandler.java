@@ -38,4 +38,9 @@ public class GlobalHttpErrorHandler {
     public ResponseEntity<Object> handlerAccountException(AccountException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AccountTransactionException.class)
+    public ResponseEntity<Object> handlerAccountTransactionException(AccountTransactionException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

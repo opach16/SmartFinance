@@ -21,7 +21,7 @@ public class AccountMapper {
                 .user(userMapper.mapToUserEntity(accountDto.getUser()))
                 .mainCurrency(currencyMapper.mapToCurrencyEntity(accountDto.getMainCurrency()))
                 .mainBalance(accountDto.getMainBalance())
-                .totalBalance(accountDto.getTotalBalance())
+                .assetsBalance(accountDto.getAssetsBalance())
                 .build();
     }
 
@@ -31,7 +31,8 @@ public class AccountMapper {
                 .user(userMapper.mapToUserDto(account.getUser()))
                 .mainCurrency(currencyMapper.mapToCurrencyDto(account.getMainCurrency()))
                 .mainBalance(account.getMainBalance())
-                .totalBalance(account.getTotalBalance())
+                .assetsBalance(account.getAssetsBalance())
+                .totalBalance(account.getMainBalance().add(account.getAssetsBalance()))
                 .createdAt(account.getCreatedAt())
                 .updatedAt(account.getUpdatedAt())
                 .build();

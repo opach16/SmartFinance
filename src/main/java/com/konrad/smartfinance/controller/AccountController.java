@@ -50,17 +50,17 @@ public class AccountController {
     }
 
     @PostMapping("/transactions")
-    public ResponseEntity<AccountTransactionDto> addTransaction(@RequestBody AccountTransactionRequest request) throws CurrencyExeption, UserException {
+    public ResponseEntity<AccountTransactionDto> addTransaction(@RequestBody AccountTransactionRequest request) throws CurrencyExeption, UserException, AccountException {
         return ResponseEntity.ok(accountMapper.mapToAccountTransactionDto(accountService.addTransaction(request)));
     }
 
     @PutMapping("/transactions/{id}")
-    public ResponseEntity<AccountTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException {
+    public ResponseEntity<AccountTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException, AccountException {
         return ResponseEntity.ok(accountMapper.mapToAccountTransactionDto(accountService.updateTransaction(id, request)));
     }
 
     @DeleteMapping("/transactions/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) throws AccountTransactionException {
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) throws AccountTransactionException, AccountException {
         accountService.deleteTransaction(id);
         return ResponseEntity.ok().build();
     }

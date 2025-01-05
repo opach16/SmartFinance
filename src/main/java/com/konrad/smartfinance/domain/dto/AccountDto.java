@@ -18,6 +18,7 @@ public class AccountDto {
     private UserDto user;
     private CurrencyDto mainCurrency;
     private BigDecimal mainBalance;
+    private BigDecimal assetsBalance;
     private BigDecimal totalBalance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

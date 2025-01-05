@@ -17,6 +17,7 @@ import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -38,9 +39,10 @@ public class AccountService {
     }
 
     public List<AccountTransaction> getAllTransactions(Long accountId) throws AccountException {
-        accountRepository.findById(accountId)
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
-        return accountTransactionRepository.findAll();
+
+        return accountTransactionRepository.findByUser(account.getUser());
     }
 
     public List<AccountTransaction> getAllExpenses(Long accountId) throws AccountException {
@@ -55,36 +57,43 @@ public class AccountService {
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
     }
 
-    public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, CurrencyExeption {
+    public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, CurrencyExeption, AccountException {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
-        AccountTransaction transaction = new AccountTransaction();
-        transaction.setUser(user);
+        AccountTransaction transaction = AccountTransaction.builder()
+                .user(user)
+                .transactionType(request.getTransactionType())
+                .name(request.getName())
+                .currency(currency)
+                .amount(request.getAmount())
+                .transactionDate(request.getTransactionDate())
+                .build();
+        AccountTransaction savedTransaction = accountTransactionRepository.save(transaction);
+        updateMainBalance(savedTransaction, true);
+        return savedTransaction;
+    }
+
+    public AccountTransaction updateTransaction(Long id, AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException, AccountException {
+        AccountTransaction transaction = accountTransactionRepository.findById(id)
+                .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
+        Currency currency = currencyRepository.findBySymbol(request.getCurrency())
+                .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
+        updateMainBalance(transaction, false);
         transaction.setTransactionType(request.getTransactionType());
         transaction.setName(request.getName());
         transaction.setCurrency(currency);
         transaction.setAmount(request.getAmount());
         transaction.setTransactionDate(request.getTransactionDate());
-        return accountTransactionRepository.save(transaction);
+        AccountTransaction updatedTransaction = accountTransactionRepository.save(transaction);
+        updateMainBalance(updatedTransaction, true);
+        return updatedTransaction;
     }
 
-    public AccountTransaction updateTransaction(Long id, AccountTransactionRequest request) throws AccountTransactionException, UserException, CurrencyExeption {
-        AccountTransaction fetchedTransaction = accountTransactionRepository.findById(id)
-                .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
-        Currency currency = currencyRepository.findBySymbol(request.getCurrency())
-                .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
-        fetchedTransaction.setTransactionType(request.getTransactionType());
-        fetchedTransaction.setName(request.getName());
-        fetchedTransaction.setCurrency(currency);
-        fetchedTransaction.setAmount(request.getAmount());
-        fetchedTransaction.setTransactionDate(request.getTransactionDate());
-        return accountTransactionRepository.save(fetchedTransaction);
-    }
-
-    public void deleteTransaction(Long id) throws AccountTransactionException {
-        accountTransactionRepository.findById(id).orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
+    public void deleteTransaction(Long id) throws AccountTransactionException, AccountException {
+        AccountTransaction transaction = accountTransactionRepository.findById(id).orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
+        updateMainBalance(transaction, false);
         accountTransactionRepository.deleteById(id);
     }
 
@@ -93,5 +102,17 @@ public class AccountService {
         return accountTransactionRepository.findAll().stream()
                 .filter(transaction -> transaction.getTransactionType() == AccountTransactionType.INCOME)
                 .toList();
+    }
+
+    private void updateMainBalance(AccountTransaction transaction, boolean newTransaction) throws AccountException {
+        Account account = accountRepository.findById(transaction.getUser().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
+        BigDecimal mainBalance = account.getMainBalance();
+        if (transaction.getTransactionType() == AccountTransactionType.INCOME) {
+            mainBalance = newTransaction ? mainBalance.add(transaction.getAmount()) : mainBalance.subtract(transaction.getAmount());
+        } else if (transaction.getTransactionType() == AccountTransactionType.EXPENSE) {
+            mainBalance = newTransaction ? mainBalance.subtract(transaction.getAmount()) : mainBalance.add(transaction.getAmount());
+        }
+        account.setMainBalance(mainBalance);
+        accountRepository.save(account);
     }
 }

@@ -31,10 +31,10 @@ public class Account {
     private Currency mainCurrency;
 
     @Column(name = "MAIN_BALANCE")
-    private BigDecimal mainBalance;
+    private BigDecimal mainBalance = BigDecimal.ZERO;
 
-    @Column(name = "TOTAL_BALANCE")
-    private BigDecimal totalBalance;
+    @Column(name = "ASSETS_BALANCE")
+    private BigDecimal assetsBalance = BigDecimal.ZERO;
 
     @NotNull
     @Column(name = "CREATED_AT")
@@ -47,7 +47,6 @@ public class Account {
         this.user = user;
         this.mainCurrency = mainCurrency;
         this.mainBalance = mainBalance;
-        this.totalBalance = mainBalance;
     }
 
     @PrePersist
