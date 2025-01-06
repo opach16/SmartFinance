@@ -22,6 +22,8 @@ public class CurrencyTransactionDto {
     private CurrencyTransactionType transactionType;
     private BigDecimal amount;
     private BigDecimal price;
+    private BigDecimal value;
+    private BigDecimal currentValue;
     private LocalDate transactionDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -1,7 +1,9 @@
 package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
+import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
+import com.konrad.smartfinance.repository.CurrencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ public class CurrencyTransactionMapper {
 
     private final UserMapper userMapper;
     private final CurrencyMapper currencyMapper;
+    private final CurrencyRepository currencyRepository;
 
     public CurrencyTransaction mapToCurrencyTransactionEntity(CurrencyTransactionDto transactionDto) {
         return CurrencyTransaction.builder()
@@ -26,6 +29,7 @@ public class CurrencyTransactionMapper {
     }
 
     public CurrencyTransactionDto mapToCurrencyTransactionDto(CurrencyTransaction transaction) {
+        Currency currency = currencyRepository.findBySymbol(transaction.getCurrency().getSymbol()).orElseThrow();
         return CurrencyTransactionDto.builder()
                 .id(transaction.getId())
                 .user(userMapper.mapToUserDto(transaction.getUser()))
@@ -33,6 +37,8 @@ public class CurrencyTransactionMapper {
                 .transactionType(transaction.getCurrencyTransactionType())
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
+                .value(transaction.getAmount().multiply(transaction.getPrice()))
+                .currentValue(transaction.getAmount().multiply(currency.getPrice()))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())

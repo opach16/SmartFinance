@@ -2,6 +2,8 @@ package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.dto.CryptoTransactionDto;
 import com.konrad.smartfinance.domain.model.CryptoTransaction;
+import com.konrad.smartfinance.domain.model.Cryptocurrency;
+import com.konrad.smartfinance.repository.CryptocurrencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,40 +15,44 @@ public class CryptoTransactionMapper {
 
     private final UserMapper userMapper;
     private final CryptocurrencyMapper cryptocurrencyMapper;
+    private final CryptocurrencyRepository cryptocurrencyRepository;
 
-    public CryptoTransaction mapToCryptoTransaction(CryptoTransactionDto cryptoTransactionDto) {
+    public CryptoTransaction mapToCryptoTransaction(CryptoTransactionDto transactionDto) {
         return CryptoTransaction.builder()
-                .user(userMapper.mapToUserEntity(cryptoTransactionDto.getUser()))
-                .cryptocurrency(cryptocurrencyMapper.mapToCryptocurrency(cryptoTransactionDto.getCryptocurrency()))
-                .cryptoTransactionType(cryptoTransactionDto.getTransactionType())
-                .amount(cryptoTransactionDto.getAmount())
-                .price(cryptoTransactionDto.getPrice())
-                .transactionDate(cryptoTransactionDto.getTransactionDate())
+                .user(userMapper.mapToUserEntity(transactionDto.getUser()))
+                .cryptocurrency(cryptocurrencyMapper.mapToCryptocurrency(transactionDto.getCryptocurrency()))
+                .cryptoTransactionType(transactionDto.getTransactionType())
+                .amount(transactionDto.getAmount())
+                .price(transactionDto.getPrice())
+                .transactionDate(transactionDto.getTransactionDate())
                 .build();
     }
 
-    public CryptoTransactionDto mapToCryptoTransactionDto(CryptoTransaction cryptoTransaction) {
+    public CryptoTransactionDto mapToCryptoTransactionDto(CryptoTransaction transaction) {
+        Cryptocurrency cryptocurrency = cryptocurrencyRepository.findById(transaction.getCryptocurrency().getId()).orElseThrow();
         return CryptoTransactionDto.builder()
-                .id(cryptoTransaction.getId())
-                .user(userMapper.mapToUserDto(cryptoTransaction.getUser()))
-                .cryptocurrency(cryptocurrencyMapper.mapToCryptocurrencyDto(cryptoTransaction.getCryptocurrency()))
-                .transactionType(cryptoTransaction.getCryptoTransactionType())
-                .amount(cryptoTransaction.getAmount())
-                .price(cryptoTransaction.getPrice())
-                .transactionDate(cryptoTransaction.getTransactionDate())
-                .createdAt(cryptoTransaction.getCreatedAt())
-                .updatedAt(cryptoTransaction.getUpdatedAt())
+                .id(transaction.getId())
+                .user(userMapper.mapToUserDto(transaction.getUser()))
+                .cryptocurrency(cryptocurrencyMapper.mapToCryptocurrencyDto(transaction.getCryptocurrency()))
+                .transactionType(transaction.getCryptoTransactionType())
+                .amount(transaction.getAmount())
+                .price(transaction.getPrice())
+                .value(transaction.getAmount().multiply(transaction.getPrice()))
+                .currentValue(transaction.getAmount().multiply(cryptocurrency.getPrice()))
+                .transactionDate(transaction.getTransactionDate())
+                .createdAt(transaction.getCreatedAt())
+                .updatedAt(transaction.getUpdatedAt())
                 .build();
     }
 
-    public List<CryptoTransaction> mapToCryptoTransactionList(List<CryptoTransactionDto> cryptoTransactionDtoList) {
-        return cryptoTransactionDtoList.stream()
+    public List<CryptoTransaction> mapToCryptoTransactionList(List<CryptoTransactionDto> transactionDtoList) {
+        return transactionDtoList.stream()
                 .map(this::mapToCryptoTransaction)
                 .toList();
     }
 
-    public List<CryptoTransactionDto> mapToCryptoTransactionDtoList(List<CryptoTransaction> cryptoTransactionList) {
-        return cryptoTransactionList.stream()
+    public List<CryptoTransactionDto> mapToCryptoTransactionDtoList(List<CryptoTransaction> transactionList) {
+        return transactionList.stream()
                 .map(this::mapToCryptoTransactionDto)
                 .toList();
     }
