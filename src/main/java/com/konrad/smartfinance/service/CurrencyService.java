@@ -31,18 +31,16 @@ public class CurrencyService {
         return fetchedCurrency.getPrice();
     }
 
-    public Currency addCurrency(Currency currency) throws CurrencyExeption {
-        if (currencyRepository.findBySymbol(currency.getSymbol()).isPresent()) {
-            throw new CurrencyExeption(currency.getSymbol() + " already exists");
+    public void updateCurrencies() {
+        List<Currency> currencies = currencyapiClient.fetchCurrencies();
+        for (Currency currency : currencies) {
+            Currency fetchedCurrency = currencyRepository.findBySymbol(currency.getSymbol()).orElse(null);
+            if (fetchedCurrency != null) {
+                fetchedCurrency.setPrice(currency.getPrice());
+                currencyRepository.save(fetchedCurrency);
+            } else {
+                currencyRepository.save(currency);
+            }
         }
-        return currencyRepository.save(currency);
     }
-
-    public Currency updateCurrencyPrice(String symbol, BigDecimal price) throws CurrencyExeption {
-        Currency fetchedCurrency = currencyRepository.findBySymbol(symbol)
-                .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
-        fetchedCurrency.setPrice(price);
-        return currencyRepository.save(fetchedCurrency);
-    }
-
 }
