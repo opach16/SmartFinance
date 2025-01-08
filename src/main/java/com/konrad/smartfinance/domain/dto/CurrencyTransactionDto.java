@@ -19,10 +19,11 @@ public class CurrencyTransactionDto {
     private Long id;
     private UserDto user;
     private CurrencyDto currency;
+    private String currencySymbol;
     private CurrencyTransactionType transactionType;
     private BigDecimal amount;
     private BigDecimal price;
-    private BigDecimal value;
+    private BigDecimal transactionValue;
     private BigDecimal currentValue;
     private LocalDate transactionDate;
     private LocalDateTime createdAt;

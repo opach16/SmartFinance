@@ -37,11 +37,12 @@ public class CurrencyTransactionMapper {
                 .transactionType(transaction.getCurrencyTransactionType())
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
-                .value(transaction.getAmount().multiply(transaction.getPrice()))
+                .transactionValue(transaction.getAmount().multiply(transaction.getPrice()))
                 .currentValue(transaction.getAmount().multiply(currency.getPrice()))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
+                .currencySymbol(transaction.getCurrency().getSymbol())
                 .build();
     }
 

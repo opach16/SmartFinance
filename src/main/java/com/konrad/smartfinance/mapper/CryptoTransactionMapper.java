@@ -42,6 +42,8 @@ public class CryptoTransactionMapper {
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
+                .cryptocurrencySymbol(transaction.getCryptocurrency().getSymbol())
+                .cryptocurrencyName(transaction.getCryptocurrency().getName())
                 .build();
     }
 

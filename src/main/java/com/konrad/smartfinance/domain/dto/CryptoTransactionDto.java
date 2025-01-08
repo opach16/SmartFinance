@@ -19,6 +19,8 @@ public class CryptoTransactionDto {
     private Long id;
     private UserDto user;
     private CryptocurrencyDto cryptocurrency;
+    private String cryptocurrencySymbol;
+    private String cryptocurrencyName;
     private CryptoTransactionType transactionType;
     private BigDecimal amount;
     private BigDecimal price;
