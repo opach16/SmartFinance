@@ -3,6 +3,7 @@ package com.konrad.smartfinance.controller;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
+import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.CurrencyTransactionException;
 import com.konrad.smartfinance.exception.UserException;
@@ -41,19 +42,19 @@ public class CurrencyTransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<CurrencyTransactionDto> addTransaction(@RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, UserException {
+    public ResponseEntity<CurrencyTransactionDto> addTransaction(@RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, UserException, AccountException {
         CurrencyTransaction transaction = currencyTransactionService.addTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionDto(transaction));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CurrencyTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption {
+    public ResponseEntity<CurrencyTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption, AccountException {
         CurrencyTransaction transaction = currencyTransactionService.updateTransaction(id, request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionDto(transaction));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) throws CurrencyTransactionException {
+    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) throws CurrencyTransactionException, AccountException {
         currencyTransactionService.deleteTransaction(id);
         return ResponseEntity.ok().build();
     }
