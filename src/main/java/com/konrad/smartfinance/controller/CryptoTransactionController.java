@@ -3,6 +3,7 @@ package com.konrad.smartfinance.controller;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionDto;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
 import com.konrad.smartfinance.domain.model.CryptoTransaction;
+import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.CryptoTransactionException;
 import com.konrad.smartfinance.exception.CryptocurrencyException;
 import com.konrad.smartfinance.exception.UserException;
@@ -40,19 +41,19 @@ public class CryptoTransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<CryptoTransactionDto> addTransaction(@RequestBody CryptoTransactionRequest request) throws CryptocurrencyException, UserException {
+    public ResponseEntity<CryptoTransactionDto> addTransaction(@RequestBody CryptoTransactionRequest request) throws CryptocurrencyException, UserException, AccountException {
         CryptoTransaction transaction = cryptoTransactionService.addTransaction(request);
         return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CryptoTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException {
+    public ResponseEntity<CryptoTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException {
         CryptoTransaction transaction = cryptoTransactionService.updateTransaction(id, request);
         return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCryptoTransaction(@PathVariable Long id) throws CryptoTransactionException {
+    public ResponseEntity<Void> deleteCryptoTransaction(@PathVariable Long id) throws CryptoTransactionException, AccountException {
         cryptoTransactionService.deleteTransaction(id);
         return ResponseEntity.ok().build();
     }
