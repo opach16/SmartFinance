@@ -71,7 +71,7 @@ public class AccountService {
                 .transactionDate(request.getTransactionDate())
                 .build();
         AccountTransaction savedTransaction = accountTransactionRepository.save(transaction);
-        updateMainBalance(savedTransaction, true);
+        updateAccountBalance(savedTransaction, true);
         return savedTransaction;
     }
 
@@ -80,20 +80,20 @@ public class AccountService {
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
-        updateMainBalance(transaction, false);
+        updateAccountBalance(transaction, false);
         transaction.setTransactionType(request.getTransactionType());
         transaction.setName(request.getName());
         transaction.setCurrency(currency);
         transaction.setAmount(request.getAmount());
         transaction.setTransactionDate(request.getTransactionDate());
         AccountTransaction updatedTransaction = accountTransactionRepository.save(transaction);
-        updateMainBalance(updatedTransaction, true);
+        updateAccountBalance(updatedTransaction, true);
         return updatedTransaction;
     }
 
     public void deleteTransaction(Long id) throws AccountTransactionException, AccountException {
         AccountTransaction transaction = accountTransactionRepository.findById(id).orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
-        updateMainBalance(transaction, false);
+        updateAccountBalance(transaction, false);
         accountTransactionRepository.deleteById(id);
     }
 
@@ -104,13 +104,13 @@ public class AccountService {
                 .toList();
     }
 
-    private void updateMainBalance(AccountTransaction transaction, boolean newTransaction) throws AccountException {
+    private void updateAccountBalance(AccountTransaction transaction, boolean isNewTransaction) throws AccountException {
         Account account = accountRepository.findById(transaction.getUser().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal mainBalance = account.getMainBalance();
         if (transaction.getTransactionType() == AccountTransactionType.INCOME) {
-            mainBalance = newTransaction ? mainBalance.add(transaction.getAmount()) : mainBalance.subtract(transaction.getAmount());
+            mainBalance = isNewTransaction ? mainBalance.add(transaction.getAmount()) : mainBalance.subtract(transaction.getAmount());
         } else if (transaction.getTransactionType() == AccountTransactionType.EXPENSE) {
-            mainBalance = newTransaction ? mainBalance.subtract(transaction.getAmount()) : mainBalance.add(transaction.getAmount());
+            mainBalance = isNewTransaction ? mainBalance.subtract(transaction.getAmount()) : mainBalance.add(transaction.getAmount());
         }
         account.setMainBalance(mainBalance);
         accountRepository.save(account);
