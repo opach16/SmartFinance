@@ -60,6 +60,7 @@ public class AccountMapper {
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
+                .currencySymbol(transaction.getCurrency().getSymbol())
                 .build();
     }
 

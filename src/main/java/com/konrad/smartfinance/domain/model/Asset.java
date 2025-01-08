@@ -1,6 +1,5 @@
 package com.konrad.smartfinance.domain.model;
 
-
 import com.konrad.smartfinance.domain.AssetType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +26,8 @@ public class Asset {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACCOUNT_ID")
-    private Account account;
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @NotNull
     @Enumerated(EnumType.STRING)

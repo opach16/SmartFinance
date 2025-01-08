@@ -21,6 +21,7 @@ public class AccountTransactionDto {
     private AccountTransactionType transactionType;
     private String name;
     private CurrencyDto currency;
+    private String currencySymbol;
     private BigDecimal amount;
     private LocalDate transactionDate;
     private LocalDateTime createdAt;
