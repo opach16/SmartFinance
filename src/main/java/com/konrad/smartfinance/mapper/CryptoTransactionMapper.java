@@ -37,7 +37,7 @@ public class CryptoTransactionMapper {
                 .transactionType(transaction.getCryptoTransactionType())
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
-                .value(transaction.getAmount().multiply(transaction.getPrice()))
+                .transactionValue(transaction.getAmount().multiply(transaction.getPrice()))
                 .currentValue(transaction.getAmount().multiply(cryptocurrency.getPrice()))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())

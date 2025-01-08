@@ -24,7 +24,7 @@ public class CryptoTransactionDto {
     private CryptoTransactionType transactionType;
     private BigDecimal amount;
     private BigDecimal price;
-    private BigDecimal value;
+    private BigDecimal transactionValue;
     private BigDecimal currentValue;
     private LocalDate transactionDate;
     private LocalDateTime createdAt;
