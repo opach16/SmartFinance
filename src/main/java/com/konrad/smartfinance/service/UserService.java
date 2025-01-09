@@ -34,8 +34,9 @@ public class UserService {
     public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption {
         Currency mainCurrency = currencyService.getCurrencyBySymbol(mainCurrencySymbol);
         User fetchedUser = userRepository.save(user);
-        accountService.createAccount(new Account(fetchedUser, mainCurrency, mainBalance));
-        return fetchedUser;
+        Account account = accountService.createAccount(new Account(fetchedUser, mainCurrency, mainBalance));
+        fetchedUser.setAccount(account);
+        return userRepository.save(fetchedUser);
     }
 
     public User updateUser(Long id, User user) throws UserException {
