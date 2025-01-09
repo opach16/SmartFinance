@@ -3,15 +3,13 @@ package com.konrad.smartfinance.domain.model;
 import com.konrad.smartfinance.domain.AssetType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,15 +40,19 @@ public class Asset {
     @Column(name = "AMOUNT")
     private BigDecimal amount;
 
-    @Column(name = "CURRENT_VALUE")
-    private BigDecimal currentValue;
-
     @NotNull
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+
+    public Asset(User user, AssetType assetType, String name, BigDecimal amount) {
+        this.user = user;
+        this.assetType = assetType;
+        this.name = name;
+        this.amount = amount;
+    }
 
     @PrePersist
     protected void onCreate() {
