@@ -68,6 +68,7 @@ public class AccountService {
                 .name(request.getName())
                 .currency(currency)
                 .amount(request.getAmount())
+                .price(request.getPrice())
                 .transactionDate(request.getTransactionDate())
                 .build();
         AccountTransaction savedTransaction = accountTransactionRepository.save(transaction);
@@ -85,6 +86,7 @@ public class AccountService {
         transaction.setName(request.getName());
         transaction.setCurrency(currency);
         transaction.setAmount(request.getAmount());
+        transaction.setPrice(request.getPrice());
         transaction.setTransactionDate(request.getTransactionDate());
         AccountTransaction updatedTransaction = accountTransactionRepository.save(transaction);
         updateAccountBalance(updatedTransaction, true);
@@ -107,10 +109,11 @@ public class AccountService {
     private void updateAccountBalance(AccountTransaction transaction, boolean isNewTransaction) throws AccountException {
         Account account = accountRepository.findById(transaction.getUser().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal mainBalance = account.getMainBalance();
+        BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
         if (transaction.getTransactionType() == AccountTransactionType.INCOME) {
-            mainBalance = isNewTransaction ? mainBalance.add(transaction.getAmount()) : mainBalance.subtract(transaction.getAmount());
+            mainBalance = isNewTransaction ? mainBalance.add(transactionValue) : mainBalance.subtract(transactionValue);
         } else if (transaction.getTransactionType() == AccountTransactionType.EXPENSE) {
-            mainBalance = isNewTransaction ? mainBalance.subtract(transaction.getAmount()) : mainBalance.add(transaction.getAmount());
+            mainBalance = isNewTransaction ? mainBalance.subtract(transactionValue) : mainBalance.add(transactionValue);
         }
         account.setMainBalance(mainBalance);
         accountRepository.save(account);

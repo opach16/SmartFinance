@@ -23,16 +23,19 @@ public class AccountTransactionDto {
     private CurrencyDto currency;
     private String currencySymbol;
     private BigDecimal amount;
+    private BigDecimal price;
+    private BigDecimal transactionValue;
     private LocalDate transactionDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public AccountTransactionDto(UserDto user, AccountTransactionType transactionType, String name, CurrencyDto currency, BigDecimal amount, LocalDate transactionDate) {
+    public AccountTransactionDto(UserDto user, AccountTransactionType transactionType, String name, CurrencyDto currency, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
         this.user = user;
         this.transactionType = transactionType;
         this.name = name;
         this.currency = currency;
         this.amount = amount;
+        this.price = price;
         this.transactionDate = transactionDate;
     }
 }

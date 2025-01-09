@@ -14,5 +14,6 @@ public class AccountTransactionRequest {
     private String name;
     private String currency;
     private BigDecimal amount;
+    private BigDecimal price;
     private LocalDate transactionDate;
 }
