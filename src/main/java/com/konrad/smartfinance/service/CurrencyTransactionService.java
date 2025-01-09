@@ -1,11 +1,8 @@
 package com.konrad.smartfinance.service;
 
-import com.konrad.smartfinance.domain.CurrencyTransactionType;
+import com.konrad.smartfinance.domain.AssetType;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
-import com.konrad.smartfinance.domain.model.Account;
-import com.konrad.smartfinance.domain.model.Currency;
-import com.konrad.smartfinance.domain.model.CurrencyTransaction;
-import com.konrad.smartfinance.domain.model.User;
+import com.konrad.smartfinance.domain.model.*;
 import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.CurrencyTransactionException;
@@ -28,6 +25,7 @@ public class CurrencyTransactionService {
     private final UserRepository userRepository;
     private final CurrencyRepository currencyRepository;
     private final AccountRepository accountRepository;
+    private final AssetsService assetsService;
 
     public List<CurrencyTransaction> getAllTransactions() {
         return currencyTransactionRepository.findAll();
@@ -44,7 +42,6 @@ public class CurrencyTransactionService {
     }
 
     public CurrencyTransaction addTransaction(CurrencyTransactionRequest request) throws UserException, CurrencyExeption, AccountException {
-        System.out.println(request.getUserId());
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
@@ -59,6 +56,7 @@ public class CurrencyTransactionService {
                 .build();
         CurrencyTransaction savedTransaction = currencyTransactionRepository.save(transaction);
         updateAccountBalance(savedTransaction, true);
+        updateAssets(savedTransaction, true);
         return savedTransaction;
     }
 
@@ -86,21 +84,44 @@ public class CurrencyTransactionService {
     }
 
     private void updateAccountBalance(CurrencyTransaction transaction, boolean isNewTransaction) throws AccountException {
-        Account account = accountRepository.findById(transaction.getUser().getAccount().getId())
+        Account account = accountRepository.findById(transaction.getUser().getId())
                 .orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal assetsBalance = account.getAssetsBalance();
         BigDecimal mainBalance = account.getMainBalance();
         BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
         BigDecimal currentValue = transaction.getAmount().multiply(transaction.getCurrency().getPrice());
-        if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.BUY) {
-            assetsBalance = isNewTransaction ? assetsBalance.add(currentValue) : assetsBalance.subtract(currentValue);
-            mainBalance = isNewTransaction ? mainBalance.subtract(transactionValue) : mainBalance.add(transactionValue);
-        } else if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.SELL) {
-            assetsBalance = isNewTransaction ? assetsBalance.subtract(currentValue) : assetsBalance.add(currentValue);
-            mainBalance = isNewTransaction ? mainBalance.add(transactionValue) : mainBalance.subtract(transactionValue);
+        switch (transaction.getCurrencyTransactionType()) {
+            case BUY -> {
+                assetsBalance = isNewTransaction ? assetsBalance.add(currentValue) : assetsBalance.subtract(currentValue);
+                mainBalance = isNewTransaction ? mainBalance.subtract(transactionValue) : mainBalance.add(transactionValue);
+            }
+            case SELL -> {
+                assetsBalance = isNewTransaction ? assetsBalance.subtract(currentValue) : assetsBalance.add(currentValue);
+                mainBalance = isNewTransaction ? mainBalance.add(transactionValue) : mainBalance.subtract(transactionValue);
+            }
         }
         account.setAssetsBalance(assetsBalance);
         account.setMainBalance(mainBalance);
         accountRepository.save(account);
+    }
+
+    private void updateAssets(CurrencyTransaction transaction, boolean isNewTransaction) throws AccountException {
+        Asset asset = new Asset(transaction.getUser(), AssetType.CURRENCY, transaction.getCurrency().getSymbol(), transaction.getAmount());
+        switch (transaction.getCurrencyTransactionType()) {
+            case BUY -> {
+                if (isNewTransaction) {
+                    assetsService.addAsset(asset);
+                } else {
+                    assetsService.deleteAsset(asset);
+                }
+            }
+            case SELL -> {
+                if (isNewTransaction) {
+                    assetsService.deleteAsset(asset);
+                } else {
+                    assetsService.addAsset(asset);
+                }
+            }
+        }
     }
 }

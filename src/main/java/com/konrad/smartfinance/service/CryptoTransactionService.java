@@ -1,11 +1,8 @@
 package com.konrad.smartfinance.service;
 
-import com.konrad.smartfinance.domain.CryptoTransactionType;
+import com.konrad.smartfinance.domain.AssetType;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
-import com.konrad.smartfinance.domain.model.Account;
-import com.konrad.smartfinance.domain.model.CryptoTransaction;
-import com.konrad.smartfinance.domain.model.Cryptocurrency;
-import com.konrad.smartfinance.domain.model.User;
+import com.konrad.smartfinance.domain.model.*;
 import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.CryptoTransactionException;
 import com.konrad.smartfinance.exception.CryptocurrencyException;
@@ -28,6 +25,7 @@ public class CryptoTransactionService {
     private final UserRepository userRepository;
     private final CryptocurrencyRepository cryptocurrencyRepository;
     private final AccountRepository accountRepository;
+    private final AssetsService assetsService;
 
     public List<CryptoTransaction> getAllTransactions() {
         return cryptoTransactionRepository.findAll();
@@ -58,6 +56,7 @@ public class CryptoTransactionService {
                 .build();
         CryptoTransaction savedTransaction = cryptoTransactionRepository.save(transaction);
         updateAccountBalance(savedTransaction, true);
+        updateAssets(savedTransaction, true);
         return savedTransaction;
     }
 
@@ -67,6 +66,7 @@ public class CryptoTransactionService {
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(request.getCryptocurrency())
                 .orElseThrow(() -> new CryptocurrencyException(CryptocurrencyException.NOT_FOUND));
         updateAccountBalance(transaction, false);
+        updateAssets(transaction, false);
         transaction.setCryptoTransactionType(request.getTransactionType());
         transaction.setCryptocurrency(cryptocurrency);
         transaction.setAmount(request.getAmount());
@@ -74,6 +74,7 @@ public class CryptoTransactionService {
         transaction.setTransactionDate(request.getTransactionDate());
         CryptoTransaction updatedTransaction = cryptoTransactionRepository.save(transaction);
         updateAccountBalance(updatedTransaction, true);
+        updateAssets(updatedTransaction, true);
         return updatedTransaction;
     }
 
@@ -82,6 +83,7 @@ public class CryptoTransactionService {
                 .orElseThrow(() -> new CryptoTransactionException(CryptoTransactionException.NOT_FOUND));
         cryptoTransactionRepository.deleteById(id);
         updateAccountBalance(transaction, false);
+        updateAssets(transaction, false);
     }
 
     private void updateAccountBalance(CryptoTransaction transaction, boolean isNewTransaction) throws AccountException {
@@ -91,15 +93,38 @@ public class CryptoTransactionService {
         BigDecimal mainBalance = account.getMainBalance();
         BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
         BigDecimal currentValue = transaction.getAmount().multiply(transaction.getCryptocurrency().getPrice());
-        if (transaction.getCryptoTransactionType() == CryptoTransactionType.BUY) {
-            assetsBalance = isNewTransaction ? assetsBalance.add(currentValue) : assetsBalance.subtract(currentValue);
-            mainBalance = isNewTransaction ? mainBalance.subtract(transactionValue) : mainBalance.add(transactionValue);
-        } else if (transaction.getCryptoTransactionType() == CryptoTransactionType.SELL) {
-            assetsBalance = isNewTransaction ? assetsBalance.subtract(currentValue) : assetsBalance.add(currentValue);
-            mainBalance = isNewTransaction ? mainBalance.add(transactionValue) : mainBalance.subtract(transactionValue);
+        switch (transaction.getCryptoTransactionType()) {
+            case BUY -> {
+                assetsBalance = isNewTransaction ? assetsBalance.add(currentValue) : assetsBalance.subtract(currentValue);
+                mainBalance = isNewTransaction ? mainBalance.subtract(transactionValue) : mainBalance.add(transactionValue);
+            }
+            case SELL -> {
+                assetsBalance = isNewTransaction ? assetsBalance.subtract(currentValue) : assetsBalance.add(currentValue);
+                mainBalance = isNewTransaction ? mainBalance.add(transactionValue) : mainBalance.subtract(transactionValue);
+            }
         }
         account.setAssetsBalance(assetsBalance);
         account.setMainBalance(mainBalance);
         accountRepository.save(account);
+    }
+
+    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) throws AccountException {
+        Asset asset = new Asset(transaction.getUser(), AssetType.CRYPTOCURRENCY, transaction.getCryptocurrency().getSymbol(), transaction.getAmount());
+        switch (transaction.getCryptoTransactionType()) {
+            case BUY -> {
+                if (isNewTransaction) {
+                    assetsService.addAsset(asset);
+                } else {
+                    assetsService.deleteAsset(asset);
+                }
+            }
+            case SELL -> {
+                if (isNewTransaction) {
+                    assetsService.deleteAsset(asset);
+                } else {
+                    assetsService.addAsset(asset);
+                }
+            }
+        }
     }
 }
