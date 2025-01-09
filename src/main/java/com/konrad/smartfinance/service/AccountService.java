@@ -4,7 +4,6 @@ import com.konrad.smartfinance.domain.AccountTransactionType;
 import com.konrad.smartfinance.domain.dto.AccountTransactionRequest;
 import com.konrad.smartfinance.domain.model.Account;
 import com.konrad.smartfinance.domain.model.AccountTransaction;
-import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.User;
 import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.AccountTransactionException;
@@ -60,13 +59,10 @@ public class AccountService {
     public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, CurrencyExeption, AccountException {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
-        Currency currency = currencyRepository.findBySymbol(request.getCurrency())
-                .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
         AccountTransaction transaction = AccountTransaction.builder()
                 .user(user)
                 .transactionType(request.getTransactionType())
                 .name(request.getName())
-                .currency(currency)
                 .amount(request.getAmount())
                 .price(request.getPrice())
                 .transactionDate(request.getTransactionDate())
@@ -79,12 +75,9 @@ public class AccountService {
     public AccountTransaction updateTransaction(Long id, AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException, AccountException {
         AccountTransaction transaction = accountTransactionRepository.findById(id)
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
-        Currency currency = currencyRepository.findBySymbol(request.getCurrency())
-                .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
         updateAccountBalance(transaction, false);
         transaction.setTransactionType(request.getTransactionType());
         transaction.setName(request.getName());
-        transaction.setCurrency(currency);
         transaction.setAmount(request.getAmount());
         transaction.setPrice(request.getPrice());
         transaction.setTransactionDate(request.getTransactionDate());

@@ -21,6 +21,10 @@ public class User {
     @Column(name = "ID", nullable = false, updatable = false, unique = true)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACCOUNT_ID")
+    private Account account;
+
     @NotNull
     @Column(name = "USERNAME")
     private String username;

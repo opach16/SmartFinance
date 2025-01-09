@@ -36,10 +36,6 @@ public class AccountTransaction {
     @Column(name = "NAME")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENCY_ID")
-    private Currency currency;
-
     @NotNull
     @Column(name = "AMOUNT")
     private BigDecimal amount;
@@ -59,11 +55,10 @@ public class AccountTransaction {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    public AccountTransaction(User user, AccountTransactionType transactionType, String name, Currency currency, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
+    public AccountTransaction(User user, AccountTransactionType transactionType, String name, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
         this.user = user;
         this.transactionType = transactionType;
         this.name = name;
-        this.currency = currency;
         this.amount = amount;
         this.price = price;
         this.transactionDate = transactionDate;

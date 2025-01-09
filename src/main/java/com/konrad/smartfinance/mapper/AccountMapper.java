@@ -43,7 +43,6 @@ public class AccountMapper {
                 .user(userMapper.mapToUserEntity(transactionDto.getUser()))
                 .transactionType(transactionDto.getTransactionType())
                 .name(transactionDto.getName())
-                .currency(currencyMapper.mapToCurrencyEntity(transactionDto.getCurrency()))
                 .amount(transactionDto.getAmount())
                 .price(transactionDto.getPrice())
                 .transactionDate(transactionDto.getTransactionDate())
@@ -56,14 +55,13 @@ public class AccountMapper {
                 .user(userMapper.mapToUserDto(transaction.getUser()))
                 .transactionType(transaction.getTransactionType())
                 .name(transaction.getName())
-                .currency(currencyMapper.mapToCurrencyDto(transaction.getCurrency()))
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
                 .transactionValue(transaction.getAmount().multiply(transaction.getPrice()))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
-                .currencySymbol(transaction.getCurrency().getSymbol())
+                .currencySymbol(transaction.getUser().getAccount().getMainCurrency().getSymbol())
                 .build();
     }
 
