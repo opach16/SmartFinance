@@ -86,7 +86,7 @@ public class CurrencyTransactionService {
     }
 
     private void updateAccountBalance(CurrencyTransaction transaction, boolean isNewTransaction) throws AccountException {
-        Account account = accountRepository.findById(transaction.getUser().getId())
+        Account account = accountRepository.findById(transaction.getUser().getAccount().getId())
                 .orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal assetsBalance = account.getAssetsBalance();
         BigDecimal mainBalance = account.getMainBalance();

@@ -100,7 +100,7 @@ public class AccountService {
     }
 
     private void updateAccountBalance(AccountTransaction transaction, boolean isNewTransaction) throws AccountException {
-        Account account = accountRepository.findById(transaction.getUser().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
+        Account account = accountRepository.findById(transaction.getUser().getAccount().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal mainBalance = account.getMainBalance();
         BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
         if (transaction.getTransactionType() == AccountTransactionType.INCOME) {
