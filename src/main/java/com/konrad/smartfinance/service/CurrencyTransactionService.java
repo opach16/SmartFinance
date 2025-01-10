@@ -66,6 +66,7 @@ public class CurrencyTransactionService {
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
         updateAccountBalance(transaction, false);
+        updateAssets(transaction, false);
         transaction.setCurrencyTransactionType(request.getTransactionType());
         transaction.setCurrency(currency);
         transaction.setAmount(request.getAmount());
@@ -73,6 +74,7 @@ public class CurrencyTransactionService {
         transaction.setTransactionDate(request.getTransactionDate());
         CurrencyTransaction updatedTransaction = currencyTransactionRepository.save(transaction);
         updateAccountBalance(updatedTransaction, true);
+        updateAssets(updatedTransaction, true);
         return updatedTransaction;
     }
 
@@ -81,6 +83,7 @@ public class CurrencyTransactionService {
                 .orElseThrow(() -> new CurrencyTransactionException(CurrencyTransactionException.NOT_FOUND));
         currencyTransactionRepository.deleteById(id);
         updateAccountBalance(transaction, false);
+        updateAssets(transaction, false);
     }
 
     private void updateAccountBalance(CurrencyTransaction transaction, boolean isNewTransaction) throws AccountException {

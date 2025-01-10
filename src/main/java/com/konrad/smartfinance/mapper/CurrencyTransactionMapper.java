@@ -1,6 +1,7 @@
 package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
+import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
 import com.konrad.smartfinance.repository.CurrencyRepository;
@@ -56,5 +57,16 @@ public class CurrencyTransactionMapper {
         return transactionList.stream()
                 .map(this::mapToCurrencyTransactionDto)
                 .toList();
+    }
+
+    public CurrencyTransactionRequest mapToCurrencyTransactionRequest(CurrencyTransaction transaction) {
+        return CurrencyTransactionRequest.builder()
+                .userId(transaction.getUser().getId())
+                .transactionType(transaction.getCurrencyTransactionType())
+                .currency(transaction.getCurrency().getSymbol())
+                .amount(transaction.getAmount())
+                .price(transaction.getPrice())
+                .transactionDate(transaction.getTransactionDate())
+                .build();
     }
 }
