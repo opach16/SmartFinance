@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class CryptoController {
 
     @GetMapping
     public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrencies() {
+        cryptocurrencyService.updateCryptocurrencies();
         return ResponseEntity.ok().body(cryptocurrencyMapper.mapToCryptocurrencyDtoList(cryptocurrencyService.getAll()));
     }
 
