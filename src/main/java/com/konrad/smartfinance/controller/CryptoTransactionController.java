@@ -1,18 +1,18 @@
 package com.konrad.smartfinance.controller;
 
+import com.konrad.smartfinance.domain.CryptoTransactionType;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionDto;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
 import com.konrad.smartfinance.domain.model.CryptoTransaction;
-import com.konrad.smartfinance.exception.AccountException;
-import com.konrad.smartfinance.exception.CryptoTransactionException;
-import com.konrad.smartfinance.exception.CryptocurrencyException;
-import com.konrad.smartfinance.exception.UserException;
+import com.konrad.smartfinance.exception.*;
 import com.konrad.smartfinance.mapper.CryptoTransactionMapper;
 import com.konrad.smartfinance.service.CryptoTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -40,21 +40,52 @@ public class CryptoTransactionController {
                 .mapToCryptoTransactionDtoList(cryptoTransactionService.getTransactionsByUserId(userId)));
     }
 
-    @PostMapping
-    public ResponseEntity<CryptoTransactionDto> addTransaction(@RequestBody CryptoTransactionRequest request) throws CryptocurrencyException, UserException, AccountException {
-        CryptoTransaction transaction = cryptoTransactionService.addTransaction(request);
-        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
+    @PostMapping()
+    public ResponseEntity<CryptoTransactionRequest> addTransactionWithParams(
+            @RequestParam Long userId,
+            @RequestParam CryptoTransactionType transactionType,
+            @RequestParam String symbol,
+            @RequestParam BigDecimal amount,
+            @RequestParam BigDecimal price,
+            @RequestParam LocalDate transactionDate
+    ) throws AccountException, CryptocurrencyException, UserException {
+        CryptoTransactionRequest request = CryptoTransactionRequest.builder()
+                .userId(userId)
+                .transactionType(transactionType)
+                .cryptocurrency(symbol)
+                .amount(amount)
+                .price(price)
+                .transactionDate(transactionDate)
+                .build();
+        CryptoTransaction response = cryptoTransactionService.addTransaction(request);
+        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionRequest(response));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CryptoTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException {
-        CryptoTransaction transaction = cryptoTransactionService.updateTransaction(id, request);
-        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDto(transaction));
+    @PutMapping
+    public ResponseEntity<CryptoTransactionRequest> updateTransactionWithParams(
+            @RequestParam Long transactionId,
+            @RequestParam Long userId,
+            @RequestParam CryptoTransactionType transactionType,
+            @RequestParam String symbol,
+            @RequestParam BigDecimal amount,
+            @RequestParam BigDecimal price,
+            @RequestParam LocalDate transactionDate
+    ) throws AccountException, CryptoTransactionException, CryptocurrencyException {
+        CryptoTransactionRequest request = CryptoTransactionRequest.builder()
+                .userId(userId)
+                .transactionType(transactionType)
+                .cryptocurrency(symbol)
+                .amount(amount)
+                .price(price)
+                .transactionDate(transactionDate)
+                .build();
+        CryptoTransaction transaction = cryptoTransactionService.updateTransaction(transactionId, request);
+        return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionRequest(transaction));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCryptoTransaction(@PathVariable Long id) throws CryptoTransactionException, AccountException {
-        cryptoTransactionService.deleteTransaction(id);
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteCryptoTransaction(@RequestParam Long transactionId) throws CryptoTransactionException, AccountException {
+        cryptoTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }
 }

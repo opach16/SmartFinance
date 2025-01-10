@@ -1,6 +1,7 @@
 package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.dto.CryptoTransactionDto;
+import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
 import com.konrad.smartfinance.domain.model.CryptoTransaction;
 import com.konrad.smartfinance.domain.model.Cryptocurrency;
 import com.konrad.smartfinance.repository.CryptocurrencyRepository;
@@ -57,5 +58,17 @@ public class CryptoTransactionMapper {
         return transactionList.stream()
                 .map(this::mapToCryptoTransactionDto)
                 .toList();
+    }
+
+    public CryptoTransactionRequest mapToCryptoTransactionRequest(CryptoTransaction transaction) {
+        return CryptoTransactionRequest.builder()
+                .userId(transaction.getUser().getId())
+                .transactionType(transaction.getCryptoTransactionType())
+                .cryptocurrency(transaction.getCryptocurrency().getSymbol())
+                .name(transaction.getCryptocurrency().getName())
+                .amount(transaction.getAmount())
+                .price(transaction.getPrice())
+                .transactionDate(transaction.getTransactionDate())
+                .build();
     }
 }

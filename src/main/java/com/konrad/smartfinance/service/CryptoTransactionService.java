@@ -108,7 +108,7 @@ public class CryptoTransactionService {
         accountRepository.save(account);
     }
 
-    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) throws AccountException {
+    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) {
         Asset asset = new Asset(transaction.getUser(), AssetType.CRYPTOCURRENCY, transaction.getCryptocurrency().getSymbol(), transaction.getAmount());
         switch (transaction.getCryptoTransactionType()) {
             case BUY -> {
