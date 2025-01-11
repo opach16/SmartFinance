@@ -1,8 +1,10 @@
 package com.konrad.smartfinance.controller;
 
+import com.konrad.smartfinance.domain.AccountTransactionType;
 import com.konrad.smartfinance.domain.dto.AccountDto;
 import com.konrad.smartfinance.domain.dto.AccountTransactionDto;
 import com.konrad.smartfinance.domain.dto.AccountTransactionRequest;
+import com.konrad.smartfinance.domain.model.AccountTransaction;
 import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.AccountTransactionException;
 import com.konrad.smartfinance.exception.CurrencyExeption;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -50,18 +53,55 @@ public class AccountController {
     }
 
     @PostMapping("/transactions")
-    public ResponseEntity<AccountTransactionDto> addTransaction(@RequestBody AccountTransactionRequest request) throws CurrencyExeption, UserException, AccountException {
-        return ResponseEntity.ok(accountMapper.mapToAccountTransactionDto(accountService.addTransaction(request)));
+    public ResponseEntity<AccountTransactionRequest> addTransactionWithParams(
+            @RequestParam Long userId,
+            @RequestParam AccountTransactionType transactionType,
+            @RequestParam String name,
+            @RequestParam String currency,
+            @RequestParam BigDecimal amount,
+            @RequestParam BigDecimal price,
+            @RequestParam LocalDate transactionDate
+    ) throws AccountException, UserException {
+        AccountTransactionRequest request = AccountTransactionRequest.builder()
+                .userId(userId)
+                .transactionType(transactionType)
+                .name(name)
+                .currency(currency)
+                .amount(amount)
+                .price(price)
+                .transactionDate(transactionDate)
+                .build();
+        AccountTransaction transaction = accountService.addTransaction(request);
+        return ResponseEntity.ok().body(accountMapper.mapToAccountTransactionRequest(transaction));
     }
 
-    @PutMapping("/transactions/{id}")
-    public ResponseEntity<AccountTransactionDto> updateTransaction(@PathVariable Long id, @RequestBody AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException, AccountException {
-        return ResponseEntity.ok(accountMapper.mapToAccountTransactionDto(accountService.updateTransaction(id, request)));
+    @PutMapping("/transactions")
+    public ResponseEntity<AccountTransactionRequest> updateTransactionWithParams(
+            @RequestParam Long transactionId,
+            @RequestParam Long userId,
+            @RequestParam AccountTransactionType transactionType,
+            @RequestParam String name,
+            @RequestParam String currency,
+            @RequestParam BigDecimal amount,
+            @RequestParam BigDecimal price,
+            @RequestParam LocalDate transactionDate
+    ) throws CurrencyExeption, AccountException, AccountTransactionException, UserException {
+        AccountTransactionRequest request = AccountTransactionRequest.builder()
+                .userId(userId)
+                .transactionType(transactionType)
+                .name(name)
+                .currency(currency)
+                .amount(amount)
+                .price(price)
+                .transactionDate(transactionDate)
+                .build();
+        AccountTransaction transaction = accountService.updateTransaction(transactionId, request);
+        return ResponseEntity.ok().body(accountMapper.mapToAccountTransactionRequest(transaction));
     }
 
-    @DeleteMapping("/transactions/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) throws AccountTransactionException, AccountException {
-        accountService.deleteTransaction(id);
+    @DeleteMapping("/transactions")
+    public ResponseEntity<Void> deleteTransaction(@RequestParam Long transactionId) throws AccountTransactionException, AccountException {
+        accountService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }
 

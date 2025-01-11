@@ -2,6 +2,7 @@ package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.dto.AccountDto;
 import com.konrad.smartfinance.domain.dto.AccountTransactionDto;
+import com.konrad.smartfinance.domain.dto.AccountTransactionRequest;
 import com.konrad.smartfinance.domain.model.Account;
 import com.konrad.smartfinance.domain.model.AccountTransaction;
 import lombok.RequiredArgsConstructor;
@@ -75,5 +76,16 @@ public class AccountMapper {
         return transactionList.stream()
                 .map(this::mapToAccountTransactionDto)
                 .toList();
+    }
+
+    public AccountTransactionRequest mapToAccountTransactionRequest(AccountTransaction transaction) {
+        return AccountTransactionRequest.builder()
+                .userId(transaction.getUser().getId())
+                .transactionType(transaction.getTransactionType())
+                .currency(transaction.getUser().getAccount().getMainCurrency().getSymbol())
+                .amount(transaction.getAmount())
+                .price(transaction.getPrice())
+                .transactionDate(transaction.getTransactionDate())
+                .build();
     }
 }

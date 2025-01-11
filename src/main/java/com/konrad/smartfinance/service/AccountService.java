@@ -11,7 +11,6 @@ import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.AccountRepository;
 import com.konrad.smartfinance.repository.AccountTransactionRepository;
-import com.konrad.smartfinance.repository.CurrencyRepository;
 import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountTransactionRepository accountTransactionRepository;
     private final UserRepository userRepository;
-    private final CurrencyRepository currencyRepository;
 
     public Account createAccount(Account account) {
         return accountRepository.save(account);
@@ -56,7 +54,7 @@ public class AccountService {
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
     }
 
-    public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, CurrencyExeption, AccountException {
+    public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, AccountException {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         AccountTransaction transaction = AccountTransaction.builder()
