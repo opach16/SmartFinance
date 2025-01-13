@@ -17,15 +17,6 @@ public class AccountMapper {
     private final UserMapper userMapper;
     private final CurrencyMapper currencyMapper;
 
-    public Account mapToAccount(AccountDto accountDto) {
-        return Account.builder()
-                .user(userMapper.mapToUserEntity(accountDto.getUser()))
-                .mainCurrency(currencyMapper.mapToCurrencyEntity(accountDto.getMainCurrency()))
-                .mainBalance(accountDto.getMainBalance())
-                .assetsBalance(accountDto.getAssetsBalance())
-                .build();
-    }
-
     public AccountDto mapToAccountDto(Account account) {
         return AccountDto.builder()
                 .id(account.getId())
@@ -36,17 +27,6 @@ public class AccountMapper {
                 .totalBalance(account.getMainBalance().add(account.getAssetsBalance()))
                 .createdAt(account.getCreatedAt())
                 .updatedAt(account.getUpdatedAt())
-                .build();
-    }
-
-    public AccountTransaction mapToAccountTransaction(AccountTransactionDto transactionDto) {
-        return AccountTransaction.builder()
-                .user(userMapper.mapToUserEntity(transactionDto.getUser()))
-                .transactionType(transactionDto.getTransactionType())
-                .name(transactionDto.getName())
-                .amount(transactionDto.getAmount())
-                .price(transactionDto.getPrice())
-                .transactionDate(transactionDto.getTransactionDate())
                 .build();
     }
 
@@ -66,12 +46,6 @@ public class AccountMapper {
                 .build();
     }
 
-    public List<AccountTransaction> mapToAccountTransactionList(List<AccountTransactionDto> transactionDtoList) {
-        return transactionDtoList.stream()
-                .map(this::mapToAccountTransaction)
-                .toList();
-    }
-
     public List<AccountTransactionDto> mapToAccountTransactionDtoList(List<AccountTransaction> transactionList) {
         return transactionList.stream()
                 .map(this::mapToAccountTransactionDto)
@@ -80,7 +54,7 @@ public class AccountMapper {
 
     public AccountTransactionRequest mapToAccountTransactionRequest(AccountTransaction transaction) {
         return AccountTransactionRequest.builder()
-                .userId(transaction.getUser().getId())
+                .transactionId(transaction.getId())
                 .transactionType(transaction.getTransactionType())
                 .currency(transaction.getUser().getAccount().getMainCurrency().getSymbol())
                 .amount(transaction.getAmount())

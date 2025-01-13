@@ -54,8 +54,8 @@ public class AccountService {
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
     }
 
-    public AccountTransaction addTransaction(AccountTransactionRequest request) throws UserException, AccountException {
-        User user = userRepository.findById(request.getUserId())
+    public AccountTransaction addTransaction(AccountTransactionRequest request, Long userId) throws UserException, AccountException {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         AccountTransaction transaction = AccountTransaction.builder()
                 .user(user)
@@ -70,8 +70,9 @@ public class AccountService {
         return savedTransaction;
     }
 
-    public AccountTransaction updateTransaction(Long id, AccountTransactionRequest request) throws AccountTransactionException, CurrencyExeption, UserException, AccountException {
-        AccountTransaction transaction = accountTransactionRepository.findById(id)
+    public AccountTransaction updateTransaction(AccountTransactionRequest request) throws AccountTransactionException, AccountException {
+        System.out.println(request.getTransactionId());
+        AccountTransaction transaction = accountTransactionRepository.findById(request.getTransactionId())
                 .orElseThrow(() -> new AccountTransactionException(AccountTransactionException.NOT_FOUND));
         updateAccountBalance(transaction, false);
         transaction.setTransactionType(request.getTransactionType());

@@ -1,22 +1,20 @@
 package com.konrad.smartfinance.controller;
 
-import com.konrad.smartfinance.domain.AccountTransactionType;
 import com.konrad.smartfinance.domain.dto.AccountDto;
 import com.konrad.smartfinance.domain.dto.AccountTransactionDto;
 import com.konrad.smartfinance.domain.dto.AccountTransactionRequest;
 import com.konrad.smartfinance.domain.model.AccountTransaction;
 import com.konrad.smartfinance.exception.AccountException;
 import com.konrad.smartfinance.exception.AccountTransactionException;
-import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.AccountMapper;
 import com.konrad.smartfinance.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -52,50 +50,17 @@ public class AccountController {
         return ResponseEntity.ok(accountMapper.mapToAccountTransactionDtoList(accountService.getAllIncomes(accountId)));
     }
 
-    @PostMapping("/transactions")
-    public ResponseEntity<AccountTransactionRequest> addTransactionWithParams(
-            @RequestParam Long userId,
-            @RequestParam AccountTransactionType transactionType,
-            @RequestParam String name,
-            @RequestParam String currency,
-            @RequestParam BigDecimal amount,
-            @RequestParam BigDecimal price,
-            @RequestParam LocalDate transactionDate
-    ) throws AccountException, UserException {
-        AccountTransactionRequest request = AccountTransactionRequest.builder()
-                .userId(userId)
-                .transactionType(transactionType)
-                .name(name)
-                .currency(currency)
-                .amount(amount)
-                .price(price)
-                .transactionDate(transactionDate)
-                .build();
-        AccountTransaction transaction = accountService.addTransaction(request);
+    @PostMapping(value = "/transactions/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AccountTransactionRequest> addTransaction(
+            @RequestBody AccountTransactionRequest request, @PathVariable Long userId) throws AccountException, UserException {
+        AccountTransaction transaction = accountService.addTransaction(request, userId);
         return ResponseEntity.ok().body(accountMapper.mapToAccountTransactionRequest(transaction));
     }
 
-    @PutMapping("/transactions")
-    public ResponseEntity<AccountTransactionRequest> updateTransactionWithParams(
-            @RequestParam Long transactionId,
-            @RequestParam Long userId,
-            @RequestParam AccountTransactionType transactionType,
-            @RequestParam String name,
-            @RequestParam String currency,
-            @RequestParam BigDecimal amount,
-            @RequestParam BigDecimal price,
-            @RequestParam LocalDate transactionDate
-    ) throws CurrencyExeption, AccountException, AccountTransactionException, UserException {
-        AccountTransactionRequest request = AccountTransactionRequest.builder()
-                .userId(userId)
-                .transactionType(transactionType)
-                .name(name)
-                .currency(currency)
-                .amount(amount)
-                .price(price)
-                .transactionDate(transactionDate)
-                .build();
-        AccountTransaction transaction = accountService.updateTransaction(transactionId, request);
+    @PutMapping(value = "/transactions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AccountTransactionRequest> addTransaction(
+            @RequestBody AccountTransactionRequest request) throws AccountException, AccountTransactionException {
+        AccountTransaction transaction = accountService.updateTransaction(request);
         return ResponseEntity.ok().body(accountMapper.mapToAccountTransactionRequest(transaction));
     }
 
