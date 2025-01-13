@@ -2,6 +2,7 @@ package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.CryptocurrencyDto;
 import com.konrad.smartfinance.exception.CryptocurrencyException;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.CryptocurrencyMapper;
 import com.konrad.smartfinance.service.CryptocurrencyService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,13 @@ public class CryptoController {
     public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrencies() {
         cryptocurrencyService.updateCryptocurrencies();
         return ResponseEntity.ok().body(cryptocurrencyMapper.mapToCryptocurrencyDtoList(cryptocurrencyService.getAll()));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrenciesById(@PathVariable Long userId) throws UserException {
+        cryptocurrencyService.updateCryptocurrencies();
+        return ResponseEntity.ok().body(cryptocurrencyMapper
+                .mapToCryptocurrencyDtoList(cryptocurrencyService.getAllCryptocurrenciesByUserId(userId)));
     }
 
     @GetMapping("/{symbol}")

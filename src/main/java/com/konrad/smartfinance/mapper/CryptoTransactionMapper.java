@@ -8,6 +8,8 @@ import com.konrad.smartfinance.repository.CryptocurrencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -18,19 +20,9 @@ public class CryptoTransactionMapper {
     private final CryptocurrencyMapper cryptocurrencyMapper;
     private final CryptocurrencyRepository cryptocurrencyRepository;
 
-    public CryptoTransaction mapToCryptoTransaction(CryptoTransactionDto transactionDto) {
-        return CryptoTransaction.builder()
-                .user(userMapper.mapToUserEntity(transactionDto.getUser()))
-                .cryptocurrency(cryptocurrencyMapper.mapToCryptocurrency(transactionDto.getCryptocurrency()))
-                .cryptoTransactionType(transactionDto.getTransactionType())
-                .amount(transactionDto.getAmount())
-                .price(transactionDto.getPrice())
-                .transactionDate(transactionDto.getTransactionDate())
-                .build();
-    }
-
     public CryptoTransactionDto mapToCryptoTransactionDto(CryptoTransaction transaction) {
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findById(transaction.getCryptocurrency().getId()).orElseThrow();
+        BigDecimal mainPrice = transaction.getUser().getAccount().getMainCurrency().getPrice();
         return CryptoTransactionDto.builder()
                 .id(transaction.getId())
                 .user(userMapper.mapToUserDto(transaction.getUser()))
@@ -39,19 +31,13 @@ public class CryptoTransactionMapper {
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
                 .transactionValue(transaction.getAmount().multiply(transaction.getPrice()))
-                .currentValue(transaction.getAmount().multiply(cryptocurrency.getPrice()))
+                .currentValue(calculateCurrentValue(transaction.getAmount(), cryptocurrency.getPrice(), mainPrice))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .cryptocurrencySymbol(transaction.getCryptocurrency().getSymbol())
                 .cryptocurrencyName(transaction.getCryptocurrency().getName())
                 .build();
-    }
-
-    public List<CryptoTransaction> mapToCryptoTransactionList(List<CryptoTransactionDto> transactionDtoList) {
-        return transactionDtoList.stream()
-                .map(this::mapToCryptoTransaction)
-                .toList();
     }
 
     public List<CryptoTransactionDto> mapToCryptoTransactionDtoList(List<CryptoTransaction> transactionList) {
@@ -70,5 +56,9 @@ public class CryptoTransactionMapper {
                 .price(transaction.getPrice())
                 .transactionDate(transaction.getTransactionDate())
                 .build();
+    }
+
+    private BigDecimal calculateCurrentValue(BigDecimal amount, BigDecimal currentPrice, BigDecimal mainUserCurrencyPrice) {
+        return amount.multiply(currentPrice).divide(mainUserCurrencyPrice, 2, RoundingMode.CEILING);
     }
 }

@@ -2,12 +2,16 @@ package com.konrad.smartfinance.service;
 
 import com.konrad.smartfinance.client.CoingeckoClient;
 import com.konrad.smartfinance.domain.model.Cryptocurrency;
+import com.konrad.smartfinance.domain.model.User;
 import com.konrad.smartfinance.exception.CryptocurrencyException;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.CryptocurrencyRepository;
+import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -16,6 +20,7 @@ public class CryptocurrencyService {
 
     private final CryptocurrencyRepository cryptocurrencyRepository;
     private final CoingeckoClient coingeckoClient;
+    private final UserRepository userRepository;
 
     public List<Cryptocurrency> getAll() {
         return cryptocurrencyRepository.findAll();
@@ -42,5 +47,23 @@ public class CryptocurrencyService {
                 cryptocurrencyRepository.save(cryptocurrency);
             }
         }
+    }
+
+    public List<Cryptocurrency> getAllCryptocurrenciesByUserId(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        BigDecimal mainCurrencyPrice = user.getAccount().getMainCurrency().getPrice();
+        return cryptocurrencyRepository.findAll().stream()
+                .map(crypto -> {
+                    return Cryptocurrency.builder()
+                            .id(crypto.getId())
+                            .symbol(crypto.getSymbol())
+                            .name(crypto.getName())
+                            .price(crypto.getPrice().divide(mainCurrencyPrice, 2, RoundingMode.CEILING))
+                            .createdAt(crypto.getCreatedAt())
+                            .updatedAt(crypto.getUpdatedAt())
+                            .build();
+                })
+                .toList();
     }
 }

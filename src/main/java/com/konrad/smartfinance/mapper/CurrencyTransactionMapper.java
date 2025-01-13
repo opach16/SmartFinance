@@ -8,6 +8,8 @@ import com.konrad.smartfinance.repository.CurrencyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -18,19 +20,9 @@ public class CurrencyTransactionMapper {
     private final CurrencyMapper currencyMapper;
     private final CurrencyRepository currencyRepository;
 
-    public CurrencyTransaction mapToCurrencyTransactionEntity(CurrencyTransactionDto transactionDto) {
-        return CurrencyTransaction.builder()
-                .user(userMapper.mapToUserEntity(transactionDto.getUser()))
-                .currency(currencyMapper.mapToCurrencyEntity(transactionDto.getCurrency()))
-                .currencyTransactionType(transactionDto.getTransactionType())
-                .amount(transactionDto.getAmount())
-                .price(transactionDto.getPrice())
-                .transactionDate(transactionDto.getTransactionDate())
-                .build();
-    }
-
     public CurrencyTransactionDto mapToCurrencyTransactionDto(CurrencyTransaction transaction) {
         Currency currency = currencyRepository.findBySymbol(transaction.getCurrency().getSymbol()).orElseThrow();
+        BigDecimal mainCurrencyPrice = transaction.getUser().getAccount().getMainCurrency().getPrice();
         return CurrencyTransactionDto.builder()
                 .id(transaction.getId())
                 .user(userMapper.mapToUserDto(transaction.getUser()))
@@ -39,18 +31,12 @@ public class CurrencyTransactionMapper {
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
                 .transactionValue(transaction.getAmount().multiply(transaction.getPrice()))
-                .currentValue(transaction.getAmount().multiply(currency.getPrice()))
+                .currentValue(calculateCurrentValue(transaction.getAmount(), currency.getPrice(), mainCurrencyPrice))
                 .transactionDate(transaction.getTransactionDate())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .currencySymbol(transaction.getCurrency().getSymbol())
                 .build();
-    }
-
-    public List<CurrencyTransaction> mapToCurrencyTransactionList(List<CurrencyTransactionDto> transactionDtoList) {
-        return transactionDtoList.stream()
-                .map(this::mapToCurrencyTransactionEntity)
-                .toList();
     }
 
     public List<CurrencyTransactionDto> mapToCurrencyTransactionDtoList(List<CurrencyTransaction> transactionList) {
@@ -68,5 +54,9 @@ public class CurrencyTransactionMapper {
                 .price(transaction.getPrice())
                 .transactionDate(transaction.getTransactionDate())
                 .build();
+    }
+
+    private BigDecimal calculateCurrentValue(BigDecimal amount, BigDecimal price, BigDecimal mainUserCurrencyPrice) {
+        return amount.multiply(price).divide(mainUserCurrencyPrice, 2, RoundingMode.CEILING);
     }
 }

@@ -1,17 +1,13 @@
 package com.konrad.smartfinance.controller;
 
-import com.konrad.smartfinance.client.CurrencyapiClient;
 import com.konrad.smartfinance.domain.dto.CurrencyDto;
-import com.konrad.smartfinance.domain.dto.currencyapiResponse.CurrencyRatesResponse;
 import com.konrad.smartfinance.exception.CurrencyExeption;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.CurrencyMapper;
 import com.konrad.smartfinance.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,7 +17,6 @@ import java.util.List;
 @RequestMapping("/api/v1/currencies")
 public class CurrencyController {
 
-    private final CurrencyapiClient currencyapiClient;
     private final CurrencyService currencyService;
     private final CurrencyMapper currencyMapper;
 
@@ -29,6 +24,13 @@ public class CurrencyController {
     public ResponseEntity<List<CurrencyDto>> getAllCurrencies() {
         currencyService.updateCurrencies();
         return ResponseEntity.ok().body(currencyMapper.mapToCurrencyDtoList(currencyService.getAllCurrencies()));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<CurrencyDto>> getAllCurrenciesWithParams(@PathVariable Long userId) throws UserException {
+        currencyService.updateCurrencies();
+        return ResponseEntity.ok().body(currencyMapper.
+                mapToCurrencyDtoList(currencyService.getAllCurrenciesByUserId(userId)));
     }
 
     @GetMapping("/{symbol}")
@@ -39,13 +41,5 @@ public class CurrencyController {
     @GetMapping("/{symbol}/price")
     public ResponseEntity<BigDecimal> getCurrencyPrice(@PathVariable String symbol) throws CurrencyExeption {
         return ResponseEntity.ok().body(currencyService.getCurrencyPrice(symbol));
-    }
-
-    @GetMapping("/abc")
-    public ResponseEntity<Void> getAllCurrenciesByAbc() {
-        CurrencyRatesResponse currencyRatesResponse = currencyapiClient.fetchAllCurrencies("PLN");
-        System.out.println(currencyRatesResponse.getMeta().getLastUpdatedAt());
-        currencyRatesResponse.getData().entrySet().stream().forEach(entry -> System.out.println(entry.getValue().getCode() + " : " + entry.getValue().getValue()));
-        return ResponseEntity.ok().build();
     }
 }

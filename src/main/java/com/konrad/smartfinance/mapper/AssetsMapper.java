@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,15 +18,6 @@ public class AssetsMapper {
     private final UserMapper userMapper;
     private final CurrencyRepository currencyRepository;
     private final CryptocurrencyRepository cryptocurrencyRepository;
-
-    public Asset mapToAsset(AssetDto assetDto) {
-        return Asset.builder()
-                .user(userMapper.mapToUserEntity(assetDto.getUser()))
-                .assetType(assetDto.getAssetType())
-                .name(assetDto.getName())
-                .amount(assetDto.getAmount())
-                .build();
-    }
 
     public AssetDto mapToAssetDto(Asset asset) {
         return AssetDto.builder()
@@ -38,12 +30,6 @@ public class AssetsMapper {
                 .build();
     }
 
-    public List<Asset> mapToAssetList(List<AssetDto> assetDtoList) {
-        return assetDtoList.stream()
-                .map(this::mapToAsset)
-                .toList();
-    }
-
     public List<AssetDto> mapToAssetDtoList(List<Asset> assetList) {
         return assetList.stream()
                 .map(this::mapToAssetDto)
@@ -51,13 +37,18 @@ public class AssetsMapper {
     }
 
     private BigDecimal calculateCurrentValue(Asset asset) {
+        BigDecimal mainCurrencyPrice = asset.getUser().getAccount().getMainCurrency().getPrice();
         return switch (asset.getAssetType()) {
             case CRYPTOCURRENCY -> cryptocurrencyRepository.findBySymbol(asset.getName())
-                    .map(cryptocurrency -> asset.getAmount().multiply(cryptocurrency.getPrice()))
+                    .map(cryptocurrency -> calculateValue(asset.getAmount(), cryptocurrency.getPrice(), mainCurrencyPrice))
                     .orElse(BigDecimal.ZERO);
             case CURRENCY -> currencyRepository.findBySymbol(asset.getName())
-                    .map(currency -> asset.getAmount().multiply(currency.getPrice()))
+                    .map(currency -> calculateValue(asset.getAmount(), currency.getPrice(), mainCurrencyPrice))
                     .orElse(BigDecimal.ZERO);
         };
+    }
+
+    private BigDecimal calculateValue(BigDecimal amount, BigDecimal assetPrice, BigDecimal mainUserCurrencyPrice) {
+        return amount.multiply(assetPrice).divide(mainUserCurrencyPrice, 2, RoundingMode.CEILING);
     }
 }
