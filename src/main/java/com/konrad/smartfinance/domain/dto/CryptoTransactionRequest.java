@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CryptoTransactionRequest {
 
-    @JsonProperty("transactionId")
+    @JsonProperty("id")
     private Long id;
     @JsonProperty("userId")
     private Long userId;
     @JsonProperty("transactionType")
     private CryptoTransactionType transactionType;
-    @JsonProperty("symbol")
+    @JsonProperty("cryptocurrencySymbol")
     private String cryptocurrency;
     @JsonProperty("name")
     private String name;

@@ -48,6 +48,7 @@ public class CryptoTransactionMapper {
 
     public CryptoTransactionRequest mapToCryptoTransactionRequest(CryptoTransaction transaction) {
         return CryptoTransactionRequest.builder()
+                .id(transaction.getId())
                 .userId(transaction.getUser().getId())
                 .transactionType(transaction.getCryptoTransactionType())
                 .cryptocurrency(transaction.getCryptocurrency().getSymbol())

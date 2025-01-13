@@ -41,8 +41,8 @@ public class CryptoTransactionService {
         return cryptoTransactionRepository.findByUserId(userId);
     }
 
-    public CryptoTransaction addTransaction(CryptoTransactionRequest request) throws UserException, CryptocurrencyException, AccountException {
-        User user = userRepository.findById(request.getUserId())
+    public CryptoTransaction addTransaction(CryptoTransactionRequest request, Long userId) throws UserException, CryptocurrencyException, AccountException {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(request.getCryptocurrency())
                 .orElseThrow(() -> new CryptocurrencyException(CryptocurrencyException.NOT_FOUND));
@@ -60,8 +60,8 @@ public class CryptoTransactionService {
         return savedTransaction;
     }
 
-    public CryptoTransaction updateTransaction(Long id, CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException {
-        CryptoTransaction transaction = cryptoTransactionRepository.findById(id)
+    public CryptoTransaction updateTransaction(CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException {
+        CryptoTransaction transaction = cryptoTransactionRepository.findById(request.getId())
                 .orElseThrow(() -> new CryptoTransactionException(CryptoTransactionException.NOT_FOUND));
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(request.getCryptocurrency())
                 .orElseThrow(() -> new CryptocurrencyException(CryptocurrencyException.NOT_FOUND));
