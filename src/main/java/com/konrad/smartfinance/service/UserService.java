@@ -38,6 +38,7 @@ public class UserService {
             throw new UserException("Username: " + user.getUsername() + " already exists");
         }
         Currency mainCurrency = currencyService.getCurrencyBySymbol(mainCurrencySymbol);
+        user.setPassword(bCrypt.encode(user.getPassword()));
         User fetchedUser = userRepository.save(user);
         Account account = accountService.createAccount(new Account(fetchedUser, mainCurrency, mainBalance));
         fetchedUser.setAccount(account);
