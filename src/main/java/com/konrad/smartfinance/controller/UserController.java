@@ -2,10 +2,12 @@ package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.CreateUserRequestDto;
 import com.konrad.smartfinance.domain.dto.UserDto;
+import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.User;
 import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.UserMapper;
+import com.konrad.smartfinance.service.CurrencyService;
 import com.konrad.smartfinance.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequestDto request) throws CurrencyExeption {
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequestDto request) throws CurrencyExeption, UserException {
         User addedUser = userService.addUser(userMapper
                 .mapToUserEntity(request.getUser()), request.getMainCurrency(), request.getMainBalance());
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.mapToUserDto(addedUser));

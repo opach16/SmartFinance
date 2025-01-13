@@ -7,6 +7,7 @@ import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,6 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AccountService accountService;
     private final CurrencyService currencyService;
+    private final BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -31,7 +33,10 @@ public class UserService {
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
     }
 
-    public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption {
+    public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption, UserException {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()){
+            throw new UserException("Username: " + user.getUsername() + " already exists");
+        }
         Currency mainCurrency = currencyService.getCurrencyBySymbol(mainCurrencySymbol);
         User fetchedUser = userRepository.save(user);
         Account account = accountService.createAccount(new Account(fetchedUser, mainCurrency, mainBalance));
