@@ -41,8 +41,8 @@ public class CurrencyTransactionService {
         return currencyTransactionRepository.findByUserId(userId);
     }
 
-    public CurrencyTransaction addTransaction(CurrencyTransactionRequest request) throws UserException, CurrencyExeption, AccountException {
-        User user = userRepository.findById(request.getUserId())
+    public CurrencyTransaction addTransaction(CurrencyTransactionRequest request, Long userId) throws UserException, CurrencyExeption, AccountException {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
@@ -60,8 +60,8 @@ public class CurrencyTransactionService {
         return savedTransaction;
     }
 
-    public CurrencyTransaction updateTransaction(Long id, CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption, AccountException {
-        CurrencyTransaction transaction = currencyTransactionRepository.findById(id)
+    public CurrencyTransaction updateTransaction(CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption, AccountException {
+        CurrencyTransaction transaction = currencyTransactionRepository.findById(request.getId())
                 .orElseThrow(() -> new CurrencyTransactionException(CurrencyTransactionException.NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));

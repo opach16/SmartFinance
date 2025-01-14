@@ -1,6 +1,5 @@
 package com.konrad.smartfinance.controller;
 
-import com.konrad.smartfinance.domain.CurrencyTransactionType;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
@@ -11,11 +10,10 @@ import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.CurrencyTransactionMapper;
 import com.konrad.smartfinance.service.CurrencyTransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -45,46 +43,17 @@ public class CurrencyTransactionController {
                 .mapToCurrencyTransactionDtoList(currencyTransactionService.getTransactionByUserId(userId)));
     }
 
-    @PostMapping
+    @PostMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> addTransactionWithParameters(
-            @RequestParam Long userId,
-            @RequestParam CurrencyTransactionType transactionType,
-            @RequestParam String currency,
-            @RequestParam BigDecimal amount,
-            @RequestParam BigDecimal price,
-            @RequestParam LocalDate transactionDate
-    ) throws CurrencyExeption, AccountException, UserException {
-        CurrencyTransactionRequest request = CurrencyTransactionRequest.builder()
-                .userId(userId)
-                .transactionType(transactionType)
-                .currency(currency)
-                .amount(amount)
-                .price(price)
-                .transactionDate(transactionDate)
-                .build();
-        CurrencyTransaction transaction = currencyTransactionService.addTransaction(request);
+            @RequestBody CurrencyTransactionRequest request, @PathVariable Long userId) throws CurrencyExeption, AccountException, UserException {
+        CurrencyTransaction transaction = currencyTransactionService.addTransaction(request, userId);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
-    @PutMapping
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> updateTransactionWithParams(
-            @RequestParam Long transactionId,
-            @RequestParam Long userId,
-            @RequestParam CurrencyTransactionType transactionType,
-            @RequestParam String currency,
-            @RequestParam BigDecimal amount,
-            @RequestParam BigDecimal price,
-            @RequestParam LocalDate transactionDate
-    ) throws CurrencyExeption, AccountException, CurrencyTransactionException {
-        CurrencyTransactionRequest request = CurrencyTransactionRequest.builder()
-                .userId(userId)
-                .transactionType(transactionType)
-                .currency(currency)
-                .amount(amount)
-                .price(price)
-                .transactionDate(transactionDate)
-                .build();
-        CurrencyTransaction transaction = currencyTransactionService.updateTransaction(transactionId, request);
+            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException {
+        CurrencyTransaction transaction = currencyTransactionService.updateTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 

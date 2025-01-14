@@ -14,11 +14,13 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyTransactionRequest {
 
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("userId")
     private Long userId;
     @JsonProperty("transactionType")
     private CurrencyTransactionType transactionType;
-    @JsonProperty("symbol")
+    @JsonProperty("currencySymbol")
     private String currency;
     @JsonProperty("amount")
     private BigDecimal amount;

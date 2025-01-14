@@ -47,6 +47,7 @@ public class CurrencyTransactionMapper {
 
     public CurrencyTransactionRequest mapToCurrencyTransactionRequest(CurrencyTransaction transaction) {
         return CurrencyTransactionRequest.builder()
+                .id(transaction.getId())
                 .userId(transaction.getUser().getId())
                 .transactionType(transaction.getCurrencyTransactionType())
                 .currency(transaction.getCurrency().getSymbol())
