@@ -1,20 +1,16 @@
 package com.konrad.smartfinance.service;
 
 import com.konrad.smartfinance.domain.AssetType;
+import com.konrad.smartfinance.domain.CurrencyTransactionType;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.*;
-import com.konrad.smartfinance.exception.AccountException;
-import com.konrad.smartfinance.exception.CurrencyExeption;
-import com.konrad.smartfinance.exception.CurrencyTransactionException;
-import com.konrad.smartfinance.exception.UserException;
-import com.konrad.smartfinance.repository.AccountRepository;
-import com.konrad.smartfinance.repository.CurrencyRepository;
-import com.konrad.smartfinance.repository.CurrencyTransactionRepository;
-import com.konrad.smartfinance.repository.UserRepository;
+import com.konrad.smartfinance.exception.*;
+import com.konrad.smartfinance.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -26,6 +22,7 @@ public class CurrencyTransactionService {
     private final CurrencyRepository currencyRepository;
     private final AccountRepository accountRepository;
     private final AssetsService assetsService;
+    private final AssetRepository assetRepository;
 
     public List<CurrencyTransaction> getAllTransactions() {
         return currencyTransactionRepository.findAll();
@@ -41,7 +38,8 @@ public class CurrencyTransactionService {
         return currencyTransactionRepository.findByUserId(userId);
     }
 
-    public CurrencyTransaction addTransaction(CurrencyTransactionRequest request, Long userId) throws UserException, CurrencyExeption, AccountException {
+    public CurrencyTransaction addTransaction(CurrencyTransactionRequest request, Long userId) throws UserException, CurrencyExeption, AccountException, AssetException {
+        verifyAssets(request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
@@ -60,11 +58,12 @@ public class CurrencyTransactionService {
         return savedTransaction;
     }
 
-    public CurrencyTransaction updateTransaction(CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption, AccountException {
+    public CurrencyTransaction updateTransaction(CurrencyTransactionRequest request) throws CurrencyTransactionException, CurrencyExeption, AccountException, AssetException {
         CurrencyTransaction transaction = currencyTransactionRepository.findById(request.getId())
                 .orElseThrow(() -> new CurrencyTransactionException(CurrencyTransactionException.NOT_FOUND));
         Currency currency = currencyRepository.findBySymbol(request.getCurrency())
                 .orElseThrow(() -> new CurrencyExeption(CurrencyExeption.CURRENCY_NOT_FOUND));
+        verifyAssets(request, transaction);
         updateAccountBalance(transaction, false);
         updateAssets(transaction, false);
         transaction.setCurrencyTransactionType(request.getTransactionType());
@@ -78,9 +77,10 @@ public class CurrencyTransactionService {
         return updatedTransaction;
     }
 
-    public void deleteTransaction(Long id) throws CurrencyTransactionException, AccountException {
+    public void deleteTransaction(Long id) throws CurrencyTransactionException, AccountException, AssetException {
         CurrencyTransaction transaction = currencyTransactionRepository.findById(id)
                 .orElseThrow(() -> new CurrencyTransactionException(CurrencyTransactionException.NOT_FOUND));
+        verifyAssets(transaction);
         currencyTransactionRepository.deleteById(id);
         updateAccountBalance(transaction, false);
         updateAssets(transaction, false);
@@ -92,7 +92,7 @@ public class CurrencyTransactionService {
         BigDecimal assetsBalance = account.getAssetsBalance();
         BigDecimal mainBalance = account.getMainBalance();
         BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
-        BigDecimal currentValue = transaction.getAmount().multiply(transaction.getCurrency().getPrice());
+        BigDecimal currentValue = transaction.getAmount().multiply(transaction.getCurrency().getPrice()).divide(account.getMainCurrency().getPrice(), 2, RoundingMode.CEILING);
         switch (transaction.getCurrencyTransactionType()) {
             case BUY -> {
                 assetsBalance = isNewTransaction ? assetsBalance.add(currentValue) : assetsBalance.subtract(currentValue);
@@ -108,7 +108,7 @@ public class CurrencyTransactionService {
         accountRepository.save(account);
     }
 
-    private void updateAssets(CurrencyTransaction transaction, boolean isNewTransaction) throws AccountException {
+    private void updateAssets(CurrencyTransaction transaction, boolean isNewTransaction) {
         Asset asset = new Asset(transaction.getUser(), AssetType.CURRENCY, transaction.getCurrency().getSymbol(), transaction.getAmount());
         switch (transaction.getCurrencyTransactionType()) {
             case BUY -> {
@@ -124,6 +124,32 @@ public class CurrencyTransactionService {
                 } else {
                     assetsService.addAsset(asset);
                 }
+            }
+        }
+    }
+
+    private void verifyAssets(CurrencyTransaction transaction) throws AssetException {
+        Asset asset = assetRepository.findByName(transaction.getCurrency().getSymbol())
+                .orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
+        if (asset.getAmount().compareTo(transaction.getAmount()) < 0) {
+            throw new AssetException("Insufficient assets");
+        }
+    }
+
+    private void verifyAssets(CurrencyTransactionRequest request) throws AssetException {
+        if (request.getTransactionType() == CurrencyTransactionType.SELL) {
+            Asset asset = assetRepository.findByName(request.getCurrency()).orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
+            if (asset.getAmount().compareTo(request.getAmount()) < 0) {
+                throw new AssetException("Insufficient assets");
+            }
+        }
+    }
+
+    private void verifyAssets(CurrencyTransactionRequest request, CurrencyTransaction transaction) throws AssetException {
+        if (request.getTransactionType() == CurrencyTransactionType.SELL) {
+            Asset asset = assetRepository.findByName(request.getCurrency()).orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
+            if (asset.getAmount().subtract(transaction.getAmount()).compareTo(request.getAmount()) < 0) {
+                throw new AssetException("Insufficient assets");
             }
         }
     }

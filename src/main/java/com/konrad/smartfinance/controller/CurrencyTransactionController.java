@@ -3,10 +3,7 @@ package com.konrad.smartfinance.controller;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
-import com.konrad.smartfinance.exception.AccountException;
-import com.konrad.smartfinance.exception.CurrencyExeption;
-import com.konrad.smartfinance.exception.CurrencyTransactionException;
-import com.konrad.smartfinance.exception.UserException;
+import com.konrad.smartfinance.exception.*;
 import com.konrad.smartfinance.mapper.CurrencyTransactionMapper;
 import com.konrad.smartfinance.service.CurrencyTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -45,20 +42,20 @@ public class CurrencyTransactionController {
 
     @PostMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> addTransactionWithParameters(
-            @RequestBody CurrencyTransactionRequest request, @PathVariable Long userId) throws CurrencyExeption, AccountException, UserException {
+            @RequestBody CurrencyTransactionRequest request, @PathVariable Long userId) throws CurrencyExeption, AccountException, UserException, AssetException {
         CurrencyTransaction transaction = currencyTransactionService.addTransaction(request, userId);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> updateTransactionWithParams(
-            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException {
+            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException, AssetException {
         CurrencyTransaction transaction = currencyTransactionService.updateTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteTransactionWithParams(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException {
+    public ResponseEntity<Void> deleteTransactionWithParams(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException, AssetException {
         currencyTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }
