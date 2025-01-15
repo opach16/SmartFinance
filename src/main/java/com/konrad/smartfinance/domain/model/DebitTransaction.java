@@ -1,6 +1,6 @@
 package com.konrad.smartfinance.domain.model;
 
-import com.konrad.smartfinance.domain.AccountTransactionType;
+import com.konrad.smartfinance.domain.DebitTransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -16,8 +16,8 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "TRANSACTIONS")
-public class AccountTransaction {
+@Table(name = "DEBIT_TRANSACTIONS")
+public class DebitTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class AccountTransaction {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "TRANSACTION_TYPE")
-    private AccountTransactionType transactionType;
+    private DebitTransactionType transactionType;
 
     @Column(name = "NAME")
     private String name;
@@ -55,7 +55,7 @@ public class AccountTransaction {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
-    public AccountTransaction(User user, AccountTransactionType transactionType, String name, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
+    public DebitTransaction(User user, DebitTransactionType transactionType, String name, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
         this.user = user;
         this.transactionType = transactionType;
         this.name = name;

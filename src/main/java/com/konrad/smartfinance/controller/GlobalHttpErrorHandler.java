@@ -39,8 +39,8 @@ public class GlobalHttpErrorHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(AccountTransactionException.class)
-    public ResponseEntity<Object> handlerAccountTransactionException(AccountTransactionException exception) {
+    @ExceptionHandler(DebitTransactionException.class)
+    public ResponseEntity<Object> handlerAccountTransactionException(DebitTransactionException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

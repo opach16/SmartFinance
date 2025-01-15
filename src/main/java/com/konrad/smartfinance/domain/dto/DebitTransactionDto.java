@@ -1,6 +1,6 @@
 package com.konrad.smartfinance.domain.dto;
 
-import com.konrad.smartfinance.domain.AccountTransactionType;
+import com.konrad.smartfinance.domain.DebitTransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountTransactionDto {
+public class DebitTransactionDto {
 
     private Long id;
     private UserDto user;
-    private AccountTransactionType transactionType;
+    private DebitTransactionType transactionType;
     private String name;
     private String currencySymbol;
     private BigDecimal amount;
@@ -28,7 +28,7 @@ public class AccountTransactionDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public AccountTransactionDto(UserDto user, AccountTransactionType transactionType, String name, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
+    public DebitTransactionDto(UserDto user, DebitTransactionType transactionType, String name, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
         this.user = user;
         this.transactionType = transactionType;
         this.name = name;
