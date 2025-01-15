@@ -24,14 +24,14 @@ public class DebitTransactionController {
     private final DebitTransactionService debitTransactionService;
 
 
-    @GetMapping("/{accountId}")
-    public ResponseEntity<List<DebitTransactionDto>> getAllTransactions(@PathVariable Long accountId) throws AccountException {
-        return ResponseEntity.ok(debitTransactionMapper.mapToAccountTransactionDtoList(debitTransactionService.getAllTransactions(accountId)));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<DebitTransactionDto> getTransactionById(@PathVariable Long id) throws DebitTransactionException {
         return ResponseEntity.ok(debitTransactionMapper.mapToAccountTransactionDto(debitTransactionService.getTransactionById(id)));
+    }
+
+    @GetMapping("/{accountId}/all")
+    public ResponseEntity<List<DebitTransactionDto>> getAllTransactions(@PathVariable Long accountId) throws AccountException {
+        return ResponseEntity.ok(debitTransactionMapper.mapToAccountTransactionDtoList(debitTransactionService.getAllTransactions(accountId)));
     }
 
     @GetMapping("/{accountId}/expenses")

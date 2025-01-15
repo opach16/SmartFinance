@@ -26,8 +26,8 @@ public class CurrencyController {
         return ResponseEntity.ok().body(currencyMapper.mapToCurrencyDtoList(currencyService.getAllCurrencies()));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<CurrencyDto>> getAllCurrenciesWithParams(@PathVariable Long userId) throws UserException {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CurrencyDto>> getAllCurrenciesByUserId(@PathVariable Long userId) throws UserException {
         currencyService.updateCurrencies();
         return ResponseEntity.ok().body(currencyMapper.
                 mapToCurrencyDtoList(currencyService.getAllCurrenciesByUserId(userId)));
