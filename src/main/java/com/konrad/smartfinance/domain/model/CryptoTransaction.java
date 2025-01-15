@@ -56,6 +56,15 @@ public class CryptoTransaction {
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
+    public CryptoTransaction(User user, Cryptocurrency cryptocurrency, CryptoTransactionType cryptoTransactionType, BigDecimal amount, BigDecimal price, LocalDate transactionDate) {
+        this.user = user;
+        this.cryptocurrency = cryptocurrency;
+        this.cryptoTransactionType = cryptoTransactionType;
+        this.amount = amount;
+        this.price = price;
+        this.transactionDate = transactionDate;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
