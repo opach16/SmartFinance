@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class CurrencyapiClient {
     public List<Currency> fetchCurrencies() {
         CurrencyRatesResponse response = fetchAllCurrencies("PLN");
         return response.getData().entrySet().stream()
-                .map(entry -> new Currency(entry.getValue().getCode(), BigDecimal.ONE.divide(entry.getValue().getValue(), 2, BigDecimal.ROUND_HALF_UP)))
+                .map(entry -> new Currency(entry.getValue().getCode(), BigDecimal.ONE.divide(entry.getValue().getValue(), 2, RoundingMode.CEILING)))
                 .toList();
     }
 }

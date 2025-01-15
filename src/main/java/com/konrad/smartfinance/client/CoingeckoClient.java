@@ -1,6 +1,5 @@
 package com.konrad.smartfinance.client;
 
-import com.konrad.smartfinance.domain.dto.CryptocurrencyDto;
 import com.konrad.smartfinance.domain.dto.coingecoResponse.CryptocurrencyRatesResponse;
 import com.konrad.smartfinance.domain.model.Cryptocurrency;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +37,6 @@ public class CoingeckoClient {
                 .encode()
                 .toUri();
         CryptocurrencyRatesResponse[] response = restTemplate.getForObject(url, CryptocurrencyRatesResponse[].class);
-        return response != null ? Arrays.stream(response).map(a -> new Cryptocurrency(a.getSymbol(), a.getName(), new BigDecimal(a.getCurrentPrice()))).toList(): Collections.emptyList();
+        return response != null ? Arrays.stream(response).map(a -> new Cryptocurrency(a.getSymbol(), a.getName(), new BigDecimal(a.getCurrentPrice()))).toList() : Collections.emptyList();
     }
 }
