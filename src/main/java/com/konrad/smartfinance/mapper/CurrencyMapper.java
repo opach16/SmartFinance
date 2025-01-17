@@ -19,22 +19,9 @@ public class CurrencyMapper {
                 .build();
     }
 
-    public Currency mapToCurrencyEntity(CurrencyDto currencyDto) {
-        return Currency.builder()
-                .symbol(currencyDto.getSymbol())
-                .price(currencyDto.getPrice())
-                .build();
-    }
-
     public List<CurrencyDto> mapToCurrencyDtoList(List<Currency> currencyList) {
         return currencyList.stream()
                 .map(this::mapToCurrencyDto)
-                .toList();
-    }
-
-    public List<Currency> mapToCurrencyEntityList(List<CurrencyDto> currencyDtoList) {
-        return currencyDtoList.stream()
-                .map(this::mapToCurrencyEntity)
                 .toList();
     }
 }

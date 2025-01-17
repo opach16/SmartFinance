@@ -14,7 +14,7 @@ public class DebitTransactionMapper {
 
     private final UserMapper userMapper;
 
-    public DebitTransactionDto mapToAccountTransactionDto(DebitTransaction transaction) {
+    public DebitTransactionDto mapToDebitTransactionDto(DebitTransaction transaction) {
         return DebitTransactionDto.builder()
                 .id(transaction.getId())
                 .user(userMapper.mapToUserDto(transaction.getUser()))
@@ -30,13 +30,13 @@ public class DebitTransactionMapper {
                 .build();
     }
 
-    public List<DebitTransactionDto> mapToAccountTransactionDtoList(List<DebitTransaction> transactionList) {
+    public List<DebitTransactionDto> mapToDebitTransactionDtoList(List<DebitTransaction> transactionList) {
         return transactionList.stream()
-                .map(this::mapToAccountTransactionDto)
+                .map(this::mapToDebitTransactionDto)
                 .toList();
     }
 
-    public DebitTransactionRequest mapToAccountTransactionRequest(DebitTransaction transaction) {
+    public DebitTransactionRequest mapToDebitTransactionRequest(DebitTransaction transaction) {
         return DebitTransactionRequest.builder()
                 .transactionId(transaction.getId())
                 .transactionType(transaction.getTransactionType())

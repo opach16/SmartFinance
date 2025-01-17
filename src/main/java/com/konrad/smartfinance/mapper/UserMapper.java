@@ -28,12 +28,6 @@ public class UserMapper {
                 .build();
     }
 
-    public List<User> mapToUserEntityList(List<UserDto> userDtoList) {
-        return userDtoList.stream()
-                .map(this::mapToUserEntity)
-                .toList();
-    }
-
     public List<UserDto> mapToUserDtoList(List<User> userList) {
         return userList.stream()
                 .map(this::mapToUserDto)

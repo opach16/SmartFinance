@@ -27,6 +27,8 @@ public class AssetsMapper {
                 .name(asset.getName())
                 .amount(asset.getAmount())
                 .currentValue(calculateCurrentValue(asset))
+                .createdAt(asset.getCreatedAt())
+                .updatedAt(asset.getUpdatedAt())
                 .build();
     }
 
