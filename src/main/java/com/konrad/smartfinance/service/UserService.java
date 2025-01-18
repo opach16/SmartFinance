@@ -33,6 +33,11 @@ public class UserService {
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
     }
 
+    public User getUserByUsername(String username) throws UserException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+    }
+
     public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption, UserException {
         if (userRepository.findByUsername(user.getUsername()).isPresent()){
             throw new UserException("Username: " + user.getUsername() + " already exists");
