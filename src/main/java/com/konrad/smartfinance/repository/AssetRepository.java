@@ -19,7 +19,7 @@ public interface AssetRepository extends CrudRepository<Asset, Long> {
 
     List<Asset> findByUser(User user);
 
-    default Optional<Asset> findByUserAndName(User user, String name) throws AssetException {
+    default Optional<Asset> findByUserAndName(User user, String name) {
         List<Asset> assetList = findByUser(user);
         return assetList.stream().filter(asset -> asset.getName().equals(name)).findFirst();
     }
