@@ -20,6 +20,8 @@ public class DebitTransactionRequest {
 
     @JsonProperty("id")
     private Long transactionId;
+    @JsonProperty("userId")
+    private Long userId;
     @JsonProperty("transactionType")
     private DebitTransactionType transactionType;
     @JsonProperty("name")

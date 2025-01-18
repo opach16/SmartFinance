@@ -29,30 +29,30 @@ public class DebitTransactionController {
         return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDto(debitTransactionService.getTransactionById(id)));
     }
 
-    @GetMapping("/{accountId}/all")
-    public ResponseEntity<List<DebitTransactionDto>> getAllTransactions(@PathVariable Long accountId) throws AccountException {
-        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllTransactions(accountId)));
+    @GetMapping("/{userId}/all")
+    public ResponseEntity<List<DebitTransactionDto>> getAllTransactions(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllTransactions(userId)));
     }
 
-    @GetMapping("/{accountId}/expenses")
-    public ResponseEntity<List<DebitTransactionDto>> getExpensesList(@PathVariable Long accountId) throws AccountException {
-        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllExpenses(accountId)));
+    @GetMapping("/{userId}/expenses")
+    public ResponseEntity<List<DebitTransactionDto>> getExpensesList(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllExpenses(userId)));
     }
 
-    @GetMapping("/{accountId}/incomes")
-    public ResponseEntity<List<DebitTransactionDto>> getIncomesList(@PathVariable Long accountId) throws AccountException {
-        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllIncomes(accountId)));
+    @GetMapping("/{userId}/incomes")
+    public ResponseEntity<List<DebitTransactionDto>> getIncomesList(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(debitTransactionMapper.mapToDebitTransactionDtoList(debitTransactionService.getAllIncomes(userId)));
     }
 
-    @PostMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DebitTransactionRequest> addTransaction(
-            @RequestBody DebitTransactionRequest request, @PathVariable Long userId) throws AccountException, UserException {
-        DebitTransaction transaction = debitTransactionService.addTransaction(request, userId);
+            @RequestBody DebitTransactionRequest request) throws AccountException, UserException {
+        DebitTransaction transaction = debitTransactionService.addTransaction(request);
         return ResponseEntity.ok().body(debitTransactionMapper.mapToDebitTransactionRequest(transaction));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DebitTransactionRequest> addTransaction(
+    public ResponseEntity<DebitTransactionRequest> updateTransaction(
             @RequestBody DebitTransactionRequest request) throws AccountException, DebitTransactionException {
         DebitTransaction transaction = debitTransactionService.updateTransaction(request);
         return ResponseEntity.ok().body(debitTransactionMapper.mapToDebitTransactionRequest(transaction));

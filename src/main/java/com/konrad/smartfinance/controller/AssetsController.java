@@ -6,6 +6,7 @@ import com.konrad.smartfinance.service.AssetsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,5 +23,10 @@ public class AssetsController {
     @GetMapping
     public ResponseEntity<List<AssetDto>> getAllAssets() {
         return ResponseEntity.ok(assetsMapper.mapToAssetDtoList(assetsService.getAllAssets()));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<AssetDto>> getAllAssetsByUsername(@PathVariable Long userId) {
+        return ResponseEntity.ok(assetsMapper.mapToAssetDtoList(assetsService.getAssetsByUserId(userId)));
     }
 }

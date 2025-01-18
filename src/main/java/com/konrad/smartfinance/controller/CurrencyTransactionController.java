@@ -40,22 +40,22 @@ public class CurrencyTransactionController {
                 .mapToCurrencyTransactionDtoList(currencyTransactionService.getTransactionByUserId(userId)));
     }
 
-    @PostMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> addTransactionWithParameters(
-            @RequestBody CurrencyTransactionRequest request, @PathVariable Long userId) throws CurrencyExeption, AccountException, UserException, AssetException {
-        CurrencyTransaction transaction = currencyTransactionService.addTransaction(request, userId);
+            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, UserException, AssetException {
+        CurrencyTransaction transaction = currencyTransactionService.addTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CurrencyTransactionRequest> updateTransactionWithParams(
-            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException, AssetException {
+            @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException, AssetException, UserException {
         CurrencyTransaction transaction = currencyTransactionService.updateTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteTransactionWithParams(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException, AssetException {
+    public ResponseEntity<Void> deleteTransactionWithParams(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException, AssetException, UserException {
         currencyTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }

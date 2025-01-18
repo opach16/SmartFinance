@@ -25,16 +25,17 @@ public class DebitTransactionService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public List<DebitTransaction> getAllTransactions(Long accountId) throws AccountException {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
-
-        return debitTransactionRepository.findByUser(account.getUser());
+    public List<DebitTransaction> getAllTransactions(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        return debitTransactionRepository.findByUser(user);
     }
 
-    public List<DebitTransaction> getAllExpenses(Long accountId) throws AccountException {
-        accountRepository.findById(accountId).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
+    public List<DebitTransaction> getAllExpenses(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         return debitTransactionRepository.findAll().stream()
+                .filter(transaction -> transaction.getUser().getUsername().equals(user.getUsername()))
                 .filter(transaction -> transaction.getTransactionType() == DebitTransactionType.EXPENSE)
                 .toList();
     }
@@ -44,8 +45,8 @@ public class DebitTransactionService {
                 .orElseThrow(() -> new DebitTransactionException(DebitTransactionException.NOT_FOUND));
     }
 
-    public DebitTransaction addTransaction(DebitTransactionRequest request, Long userId) throws UserException, AccountException {
-        User user = userRepository.findById(userId)
+    public DebitTransaction addTransaction(DebitTransactionRequest request) throws UserException, AccountException {
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         DebitTransaction transaction = DebitTransaction.builder()
                 .user(user)
@@ -75,20 +76,24 @@ public class DebitTransactionService {
     }
 
     public void deleteTransaction(Long id) throws DebitTransactionException, AccountException {
-        DebitTransaction transaction = debitTransactionRepository.findById(id).orElseThrow(() -> new DebitTransactionException(DebitTransactionException.NOT_FOUND));
+        DebitTransaction transaction = debitTransactionRepository.findById(id)
+                .orElseThrow(() -> new DebitTransactionException(DebitTransactionException.NOT_FOUND));
         updateAccountBalance(transaction, false);
         debitTransactionRepository.deleteById(id);
     }
 
-    public List<DebitTransaction> getAllIncomes(Long accountId) throws AccountException {
-        accountRepository.findById(accountId).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
+    public List<DebitTransaction> getAllIncomes(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         return debitTransactionRepository.findAll().stream()
+                .filter(transaction -> transaction.getUser().getUsername().equals(user.getUsername()))
                 .filter(transaction -> transaction.getTransactionType() == DebitTransactionType.INCOME)
                 .toList();
     }
 
     private void updateAccountBalance(DebitTransaction transaction, boolean isNewTransaction) throws AccountException {
-        Account account = accountRepository.findById(transaction.getUser().getAccount().getId()).orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
+        Account account = accountRepository.findById(transaction.getUser().getAccount().getId())
+                .orElseThrow(() -> new AccountException(AccountException.NOT_FOUND));
         BigDecimal mainBalance = account.getMainBalance();
         BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
         if (transaction.getTransactionType() == DebitTransactionType.INCOME) {

@@ -1,7 +1,7 @@
 package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.AccountDto;
-import com.konrad.smartfinance.exception.AccountException;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.AccountMapper;
 import com.konrad.smartfinance.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +21,9 @@ public class AccountController {
     private final AccountService accountService;
     private final AccountMapper accountMapper;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AccountDto> getAccount(@PathVariable Long id) throws AccountException {
-        return ResponseEntity.ok(accountMapper.mapToAccountDto(accountService.getAccountById(id)));
+    @GetMapping("/{userId}")
+    public ResponseEntity<AccountDto> getAccount(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(accountMapper.mapToAccountDto(accountService.getAccountByUserId(userId)));
     }
 
     @GetMapping("/balance/{id}")

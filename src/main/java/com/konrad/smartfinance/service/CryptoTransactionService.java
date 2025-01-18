@@ -34,13 +34,14 @@ public class CryptoTransactionService {
     }
 
     public List<CryptoTransaction> getTransactionsByUserId(Long userId) throws UserException {
-        userRepository.findById(userId).orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
-        return cryptoTransactionRepository.findByUserId(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        return cryptoTransactionRepository.findByUserId(user.getId());
     }
 
-    public CryptoTransaction addTransaction(CryptoTransactionRequest request, Long userId) throws UserException, CryptocurrencyException, AccountException, AssetException {
+    public CryptoTransaction addTransaction(CryptoTransactionRequest request) throws UserException, CryptocurrencyException, AccountException, AssetException {
         verifyAssets(request);
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(request.getCryptocurrency())
                 .orElseThrow(() -> new CryptocurrencyException(CryptocurrencyException.NOT_FOUND));
@@ -58,7 +59,7 @@ public class CryptoTransactionService {
         return savedTransaction;
     }
 
-    public CryptoTransaction updateTransaction(CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException, AssetException {
+    public CryptoTransaction updateTransaction(CryptoTransactionRequest request) throws CryptoTransactionException, CryptocurrencyException, AccountException, AssetException, UserException {
         CryptoTransaction transaction = cryptoTransactionRepository.findById(request.getId())
                 .orElseThrow(() -> new CryptoTransactionException(CryptoTransactionException.NOT_FOUND));
         Cryptocurrency cryptocurrency = cryptocurrencyRepository.findBySymbol(request.getCryptocurrency())
@@ -77,7 +78,7 @@ public class CryptoTransactionService {
         return updatedTransaction;
     }
 
-    public void deleteTransaction(Long id) throws CryptoTransactionException, AccountException, AssetException {
+    public void deleteTransaction(Long id) throws CryptoTransactionException, AccountException, AssetException, UserException {
         CryptoTransaction transaction = cryptoTransactionRepository.findById(id)
                 .orElseThrow(() -> new CryptoTransactionException(CryptoTransactionException.NOT_FOUND));
         verifyAssets(transaction);
@@ -108,7 +109,7 @@ public class CryptoTransactionService {
         accountRepository.save(account);
     }
 
-    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) {
+    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) throws AssetException {
         Asset asset = new Asset(transaction.getUser(), AssetType.CRYPTOCURRENCY, transaction.getCryptocurrency().getSymbol(), transaction.getAmount());
         switch (transaction.getCryptoTransactionType()) {
             case BUY -> {
@@ -129,25 +130,31 @@ public class CryptoTransactionService {
     }
 
     private void verifyAssets(CryptoTransaction transaction) throws AssetException {
-        Asset asset = assetRepository.findByName(transaction.getCryptocurrency().getSymbol())
+        Asset asset = assetRepository.findByUserAndName(transaction.getUser(), transaction.getCryptocurrency().getSymbol())
                 .orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
         if (asset.getAmount().compareTo(transaction.getAmount()) < 0) {
             throw new AssetException("Insufficient assets");
         }
     }
 
-    private void verifyAssets(CryptoTransactionRequest request) throws AssetException {
+    private void verifyAssets(CryptoTransactionRequest request) throws AssetException, UserException {
         if (request.getTransactionType() == CryptoTransactionType.SELL) {
-            Asset asset = assetRepository.findByName(request.getCryptocurrency()).orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+            Asset asset = assetRepository.findByUserAndName(user, request.getCryptocurrency())
+                    .orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
             if (asset.getAmount().compareTo(request.getAmount()) < 0) {
                 throw new AssetException("Insufficient assets");
             }
         }
     }
 
-    private void verifyAssets(CryptoTransactionRequest request, CryptoTransaction transaction) throws AssetException {
+    private void verifyAssets(CryptoTransactionRequest request, CryptoTransaction transaction) throws AssetException, UserException {
         if (request.getTransactionType() == CryptoTransactionType.SELL) {
-            Asset asset = assetRepository.findByName(request.getCryptocurrency()).orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+            Asset asset = assetRepository.findByUserAndName(user, request.getCryptocurrency())
+                    .orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
             if (asset.getAmount().subtract(transaction.getAmount()).compareTo(request.getAmount()) < 0) {
                 throw new AssetException("Insufficient assets");
             }
