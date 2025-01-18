@@ -7,7 +7,9 @@ import com.konrad.smartfinance.exception.CryptocurrencyException;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.CryptocurrencyRepository;
 import com.konrad.smartfinance.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +38,7 @@ public class CryptocurrencyService {
         return fetchedCryptocurrency.getPrice();
     }
 
+    @Scheduled(cron = "0 0 5 * * ?")
     public void updateCryptocurrencies() {
         List<Cryptocurrency> cryptocurrencies = coingeckoClient.fetchCryptocurrencies();
         for (Cryptocurrency cryptocurrency : cryptocurrencies) {
@@ -65,5 +68,10 @@ public class CryptocurrencyService {
                             .build();
                 })
                 .toList();
+    }
+
+    @PostConstruct
+    public void init() {
+        updateCryptocurrencies();
     }
 }

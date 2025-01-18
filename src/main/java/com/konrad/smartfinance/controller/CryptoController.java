@@ -25,13 +25,11 @@ public class CryptoController {
 
     @GetMapping
     public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrencies() {
-        cryptocurrencyService.updateCryptocurrencies();
         return ResponseEntity.ok().body(cryptocurrencyMapper.mapToCryptocurrencyDtoList(cryptocurrencyService.getAll()));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<CryptocurrencyDto>> getAllCryptocurrenciesByUserId(@PathVariable Long userId) throws UserException {
-        cryptocurrencyService.updateCryptocurrencies();
         return ResponseEntity.ok().body(cryptocurrencyMapper
                 .mapToCryptocurrencyDtoList(cryptocurrencyService.getAllCryptocurrenciesByUserId(userId)));
     }

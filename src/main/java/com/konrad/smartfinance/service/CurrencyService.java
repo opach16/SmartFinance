@@ -7,7 +7,9 @@ import com.konrad.smartfinance.exception.CurrencyExeption;
 import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.CurrencyRepository;
 import com.konrad.smartfinance.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +38,7 @@ public class CurrencyService {
         return fetchedCurrency.getPrice();
     }
 
+    @Scheduled(cron = "0 0 5 * * ?")
     public void updateCurrencies() {
         List<Currency> currencies = currencyapiClient.fetchCurrencies();
         for (Currency currency : currencies) {
@@ -64,5 +67,10 @@ public class CurrencyService {
                             .build();
                 })
                 .toList();
+    }
+
+    @PostConstruct
+    public void init() {
+        updateCurrencies();
     }
 }

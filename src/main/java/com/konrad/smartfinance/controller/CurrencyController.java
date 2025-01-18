@@ -22,13 +22,11 @@ public class CurrencyController {
 
     @GetMapping
     public ResponseEntity<List<CurrencyDto>> getAllCurrencies() {
-        currencyService.updateCurrencies();
         return ResponseEntity.ok().body(currencyMapper.mapToCurrencyDtoList(currencyService.getAllCurrencies()));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<CurrencyDto>> getAllCurrenciesByUserId(@PathVariable Long userId) throws UserException {
-        currencyService.updateCurrencies();
         return ResponseEntity.ok().body(currencyMapper.
                 mapToCurrencyDtoList(currencyService.getAllCurrenciesByUserId(userId)));
     }
