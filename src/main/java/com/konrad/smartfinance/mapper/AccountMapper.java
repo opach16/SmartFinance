@@ -13,7 +13,7 @@ public class AccountMapper {
     private final CurrencyMapper currencyMapper;
 
     public AccountDto mapToAccountDto(Account account) {
-        return AccountDto.builder()
+        return new AccountDto.Builder()
                 .id(account.getId())
                 .user(userMapper.mapToUserDto(account.getUser()))
                 .mainCurrency(currencyMapper.mapToCurrencyDto(account.getMainCurrency()))
