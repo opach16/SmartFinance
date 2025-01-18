@@ -13,8 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -55,5 +54,26 @@ class AssetRepositoryTestSuite {
         //then
         assertTrue(fetchedAsset.isPresent());
         assertEquals(asset.getName(), fetchedAsset.get().getName());
+    }
+
+    @Test
+    void findByUserAndName() {
+        //given
+        User user2 = new User("testUsername2", "testEmail2", "testPassword2");
+        userRepository.save(user2);
+        Asset asset1 = new Asset(user, AssetType.CURRENCY, "testCurrency1", BigDecimal.ONE);
+        Asset asset2 = new Asset(user, AssetType.CRYPTOCURRENCY, "testCurrency2", BigDecimal.TWO);
+        assetRepository.save(asset1);
+        assetRepository.save(asset2);
+        //when
+        Optional<Asset> testCurrency1 = assetRepository.findByUserAndName(user, "testCurrency1");
+        Optional<Asset> testCurrency2 = assetRepository.findByUserAndName(user, "testCurrency2");
+        Optional<Asset> testCurrency3 = assetRepository.findByUserAndName(user2, "testCurrency1");
+        Optional<Asset> testCurrency4 = assetRepository.findByUserAndName(user, "testCurrency3");
+        //then
+        assertTrue(testCurrency1.isPresent());
+        assertTrue(testCurrency2.isPresent());
+        assertFalse(testCurrency3.isPresent());
+        assertFalse(testCurrency4.isPresent());
     }
 }

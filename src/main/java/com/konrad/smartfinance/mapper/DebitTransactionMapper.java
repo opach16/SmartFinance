@@ -39,6 +39,7 @@ public class DebitTransactionMapper {
     public DebitTransactionRequest mapToDebitTransactionRequest(DebitTransaction transaction) {
         return DebitTransactionRequest.builder()
                 .transactionId(transaction.getId())
+                .userId(transaction.getUser().getId())
                 .transactionType(transaction.getTransactionType())
                 .name(transaction.getName())
                 .currency(transaction.getUser().getAccount().getMainCurrency().getSymbol())

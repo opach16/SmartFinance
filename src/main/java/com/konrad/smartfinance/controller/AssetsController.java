@@ -26,7 +26,7 @@ public class AssetsController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<AssetDto>> getAllAssetsByUsername(@PathVariable Long userId) {
+    public ResponseEntity<List<AssetDto>> getAllAssetsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(assetsMapper.mapToAssetDtoList(assetsService.getAssetsByUserId(userId)));
     }
 }

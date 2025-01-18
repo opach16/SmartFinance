@@ -33,7 +33,7 @@ public class CryptoTransactionController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CryptoTransactionDto>> getTransactionsByUsername(@PathVariable Long userId) throws UserException {
+    public ResponseEntity<List<CryptoTransactionDto>> getTransactionsByUserId(@PathVariable Long userId) throws UserException {
         return ResponseEntity.ok().body(cryptoTransactionMapper
                 .mapToCryptoTransactionDtoList(cryptoTransactionService.getTransactionsByUserId(userId)));
     }
@@ -47,7 +47,7 @@ public class CryptoTransactionController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CryptoTransactionRequest> updateTransactionWithParams(
+    public ResponseEntity<CryptoTransactionRequest> updateTransaction(
             @RequestBody CryptoTransactionRequest request
     ) throws AccountException, CryptoTransactionException, CryptocurrencyException, AssetException, UserException {
         CryptoTransaction transaction = cryptoTransactionService.updateTransaction(request);
@@ -55,7 +55,7 @@ public class CryptoTransactionController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<Void> deleteCryptoTransaction(@RequestParam Long transactionId) throws CryptoTransactionException, AccountException, AssetException, UserException {
+    public ResponseEntity<Void> deleteTransaction(@RequestParam Long transactionId) throws CryptoTransactionException, AccountException, AssetException {
         cryptoTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }

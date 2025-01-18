@@ -78,7 +78,7 @@ public class CryptoTransactionService {
         return updatedTransaction;
     }
 
-    public void deleteTransaction(Long id) throws CryptoTransactionException, AccountException, AssetException, UserException {
+    public void deleteTransaction(Long id) throws CryptoTransactionException, AccountException, AssetException {
         CryptoTransaction transaction = cryptoTransactionRepository.findById(id)
                 .orElseThrow(() -> new CryptoTransactionException(CryptoTransactionException.NOT_FOUND));
         verifyAssets(transaction);
@@ -109,7 +109,7 @@ public class CryptoTransactionService {
         accountRepository.save(account);
     }
 
-    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) throws AssetException {
+    private void updateAssets(CryptoTransaction transaction, boolean isNewTransaction) {
         Asset asset = new Asset(transaction.getUser(), AssetType.CRYPTOCURRENCY, transaction.getCryptocurrency().getSymbol(), transaction.getAmount());
         switch (transaction.getCryptoTransactionType()) {
             case BUY -> {

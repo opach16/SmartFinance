@@ -78,7 +78,7 @@ public class CurrencyTransactionService {
         return updatedTransaction;
     }
 
-    public void deleteTransaction(Long id) throws CurrencyTransactionException, AccountException, AssetException, UserException {
+    public void deleteTransaction(Long id) throws CurrencyTransactionException, AccountException, AssetException {
         CurrencyTransaction transaction = currencyTransactionRepository.findById(id)
                 .orElseThrow(() -> new CurrencyTransactionException(CurrencyTransactionException.NOT_FOUND));
         verifyAssets(transaction);
@@ -109,7 +109,7 @@ public class CurrencyTransactionService {
         accountRepository.save(account);
     }
 
-    private void updateAssets(CurrencyTransaction transaction, boolean isNewTransaction) throws AssetException {
+    private void updateAssets(CurrencyTransaction transaction, boolean isNewTransaction) {
         Asset asset = new Asset(transaction.getUser(), AssetType.CURRENCY, transaction.getCurrency().getSymbol(), transaction.getAmount());
         switch (transaction.getCurrencyTransactionType()) {
             case BUY -> {

@@ -41,21 +41,21 @@ public class CurrencyTransactionController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CurrencyTransactionRequest> addTransactionWithParameters(
+    public ResponseEntity<CurrencyTransactionRequest> addTransaction(
             @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, UserException, AssetException {
         CurrencyTransaction transaction = currencyTransactionService.addTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CurrencyTransactionRequest> updateTransactionWithParams(
+    public ResponseEntity<CurrencyTransactionRequest> updateTransaction(
             @RequestBody CurrencyTransactionRequest request) throws CurrencyExeption, AccountException, CurrencyTransactionException, AssetException, UserException {
         CurrencyTransaction transaction = currencyTransactionService.updateTransaction(request);
         return ResponseEntity.ok().body(currencyTransactionMapper.mapToCurrencyTransactionRequest(transaction));
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteTransactionWithParams(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException, AssetException, UserException {
+    public ResponseEntity<Void> deleteTransaction(@RequestParam Long transactionId) throws CurrencyTransactionException, AccountException, AssetException {
         currencyTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
     }

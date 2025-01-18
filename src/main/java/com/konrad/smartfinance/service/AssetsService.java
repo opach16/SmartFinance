@@ -24,14 +24,14 @@ public class AssetsService {
                 .toList();
     }
 
-    public void addAsset(Asset asset) throws AssetException {
+    public void addAsset(Asset asset) {
         assetRepository.findByUserAndName(asset.getUser(), asset.getName()).ifPresentOrElse(presentAsset -> {
             presentAsset.setAmount(presentAsset.getAmount().add(asset.getAmount()));
            assetRepository.save(presentAsset);
            }, () -> assetRepository.save(asset));
     }
 
-    public void deleteAsset(Asset asset) throws AssetException {
+    public void deleteAsset(Asset asset) {
         assetRepository.findByUserAndName(asset.getUser(), asset.getName()).ifPresent(presentAsset -> {
             if (presentAsset.getAmount().compareTo(asset.getAmount()) <= 0) {
                 assetRepository.delete(presentAsset);
