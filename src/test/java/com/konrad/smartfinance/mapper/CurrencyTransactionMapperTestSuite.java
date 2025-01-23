@@ -1,58 +1,75 @@
 package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.CurrencyTransactionType;
+import com.konrad.smartfinance.domain.dto.CurrencyDto;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionDto;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
+import com.konrad.smartfinance.domain.dto.UserDto;
 import com.konrad.smartfinance.domain.model.Account;
 import com.konrad.smartfinance.domain.model.Currency;
 import com.konrad.smartfinance.domain.model.CurrencyTransaction;
 import com.konrad.smartfinance.domain.model.User;
 import com.konrad.smartfinance.repository.CurrencyRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class CurrencyTransactionMapperTestSuite {
 
     private Currency currency1;
     private Currency currency2;
+    private UserDto userDto1;
+    private UserDto userDto2;
     private User user1;
     private User user2;
     private Account account1;
     private Account account2;
 
-    @Autowired
+    @InjectMocks
     private CurrencyTransactionMapper currencyTransactionMapper;
 
-    @Autowired
+    @Mock
+    private CurrencyMapper currencyMapper;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
     private CurrencyRepository currencyRepository;
 
     @BeforeEach
     void setUp() {
         currency1 = Currency.builder()
+                .id(1L)
                 .symbol("USD")
                 .price(new BigDecimal("5"))
                 .build();
         currency2 = Currency.builder()
+                .id(2L)
                 .symbol("EUR")
                 .price(new BigDecimal("4"))
                 .build();
-        currencyRepository.save(currency1);
-        currencyRepository.save(currency2);
-
+        userDto1 = UserDto.builder()
+                .id(1L)
+                .build();
+        userDto2 = UserDto.builder()
+                .id(2L)
+                .build();
         user1 = User.builder()
                 .id(1L)
                 .username("testUsername1")
@@ -62,7 +79,7 @@ class CurrencyTransactionMapperTestSuite {
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
         user2 = User.builder()
-                .id(1L)
+                .id(2L)
                 .username("testUsername2")
                 .email("testEmail2")
                 .password("testPassword2")
@@ -77,7 +94,7 @@ class CurrencyTransactionMapperTestSuite {
                 .build();
         account2 = Account.builder()
                 .id(2L)
-                .user(user1)
+                .user(user2)
                 .mainCurrency(currency2)
                 .mainBalance(new BigDecimal("400"))
                 .build();
@@ -99,13 +116,15 @@ class CurrencyTransactionMapperTestSuite {
                 .createdAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
+        when(currencyRepository.findBySymbol(currency1.getSymbol())).thenReturn(Optional.of(currency1));
+        when(userMapper.mapToUserDto(user2)).thenReturn(userDto2);
+        when(currencyMapper.mapToCurrencyDto(currency1)).thenReturn(CurrencyDto.builder().id(1L).price(currency1.getPrice()).build());
         //when
         CurrencyTransactionDto currencyTransactionDto = currencyTransactionMapper.mapToCurrencyTransactionDto(currencyTransaction);
         //then
         assertNotNull(currencyTransactionDto);
         assertEquals(currencyTransaction.getId(), currencyTransactionDto.getId());
         assertEquals(currencyTransaction.getUser().getId(), currencyTransactionDto.getUser().getId());
-        assertEquals(currencyTransaction.getUser().getUsername(), currencyTransactionDto.getUser().getUsername());
         assertEquals(currencyTransaction.getCurrencyTransactionType(), currencyTransactionDto.getTransactionType());
         assertEquals(currencyTransaction.getAmount(), currencyTransactionDto.getAmount());
         assertEquals(currencyTransaction.getPrice(), currencyTransactionDto.getPrice());
@@ -146,6 +165,12 @@ class CurrencyTransactionMapperTestSuite {
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
         List<CurrencyTransaction> currencyTransactionList = List.of(currencyTransaction1, currencyTransaction2);
+        when(currencyRepository.findBySymbol(currency1.getSymbol())).thenReturn(Optional.of(currency1));
+        when(currencyRepository.findBySymbol(currency2.getSymbol())).thenReturn(Optional.of(currency2));
+        when(userMapper.mapToUserDto(user1)).thenReturn(userDto1);
+        when(userMapper.mapToUserDto(user2)).thenReturn(userDto2);
+        when(currencyMapper.mapToCurrencyDto(currency1)).thenReturn(CurrencyDto.builder().id(1L).price(currency1.getPrice()).build());
+        when(currencyMapper.mapToCurrencyDto(currency2)).thenReturn(CurrencyDto.builder().id(2L).price(currency2.getPrice()).build());
         //when
         List<CurrencyTransactionDto> dtoList = currencyTransactionMapper.mapToCurrencyTransactionDtoList(currencyTransactionList);
         //then
@@ -153,7 +178,6 @@ class CurrencyTransactionMapperTestSuite {
         assertEquals(currencyTransactionList.size(), dtoList.size());
         assertEquals(currencyTransaction1.getId(), dtoList.getFirst().getId());
         assertEquals(currencyTransaction1.getUser().getId(), dtoList.getFirst().getUser().getId());
-        assertEquals(currencyTransaction1.getUser().getUsername(), dtoList.getFirst().getUser().getUsername());
         assertEquals(currencyTransaction1.getCurrency().getId(), dtoList.getFirst().getCurrency().getId());
         assertEquals(currencyTransaction2.getId(), dtoList.getLast().getId());
     }
