@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
@@ -24,6 +25,7 @@ class CryptocurrencyRepositoryTestSuite {
 
     @BeforeEach
     void setUp() {
+        cryptocurrencyRepository.deleteAll();
         crypto = new Cryptocurrency("testSymbol", "testName", BigDecimal.ONE);
         cryptocurrencyRepository.save(crypto);
     }
