@@ -23,6 +23,7 @@ class UserRepositoryTestSuite {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
         user = new User("testUsername", "testEmail", "testPassword");
         userRepository.save(user);
     }

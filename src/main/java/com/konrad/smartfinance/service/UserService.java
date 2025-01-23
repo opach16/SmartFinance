@@ -22,7 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AccountService accountService;
     private final CurrencyService currencyService;
-    private final BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder bCrypt;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
