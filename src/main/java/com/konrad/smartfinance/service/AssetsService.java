@@ -2,7 +2,9 @@ package com.konrad.smartfinance.service;
 
 import com.konrad.smartfinance.domain.model.Asset;
 import com.konrad.smartfinance.exception.AssetException;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.repository.AssetRepository;
+import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +15,14 @@ import java.util.List;
 public class AssetsService {
 
     private final AssetRepository assetRepository;
+    private final UserRepository userRepository;
 
     public List<Asset> getAllAssets() {
         return assetRepository.findAll();
     }
 
-    public List<Asset> getAssetsByUserId(Long userId) {
+    public List<Asset> getAssetsByUserId(Long userId) throws UserException {
+        userRepository.findById(userId).orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         return assetRepository.findAll().stream()
                 .filter(asset -> asset.getUser().getId().equals(userId))
                 .toList();

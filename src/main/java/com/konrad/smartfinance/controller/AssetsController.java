@@ -1,6 +1,7 @@
 package com.konrad.smartfinance.controller;
 
 import com.konrad.smartfinance.domain.dto.AssetDto;
+import com.konrad.smartfinance.exception.UserException;
 import com.konrad.smartfinance.mapper.AssetsMapper;
 import com.konrad.smartfinance.service.AssetsService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class AssetsController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<AssetDto>> getAllAssetsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<AssetDto>> getAllAssetsByUserId(@PathVariable Long userId) throws UserException {
         return ResponseEntity.ok(assetsMapper.mapToAssetDtoList(assetsService.getAssetsByUserId(userId)));
     }
 }
