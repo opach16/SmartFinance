@@ -25,6 +25,7 @@ class CurrencyRepositoryTestSuite {
 
     @BeforeEach
     void setUp() {
+        currencyRepository.deleteAll();
         currency = new Currency("testSymbol", BigDecimal.ONE);
         currencyRepository.save(currency);
     }
