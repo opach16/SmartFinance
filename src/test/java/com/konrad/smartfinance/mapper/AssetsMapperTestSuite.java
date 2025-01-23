@@ -2,25 +2,28 @@ package com.konrad.smartfinance.mapper;
 
 import com.konrad.smartfinance.domain.AssetType;
 import com.konrad.smartfinance.domain.dto.AssetDto;
+import com.konrad.smartfinance.domain.dto.UserDto;
 import com.konrad.smartfinance.domain.model.*;
 import com.konrad.smartfinance.repository.CryptocurrencyRepository;
 import com.konrad.smartfinance.repository.CurrencyRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class AssetsMapperTestSuite {
 
     private Cryptocurrency crypto;
@@ -28,39 +31,40 @@ class AssetsMapperTestSuite {
     private Currency mainCurrency;
     private Account account;
     private User user;
+    private UserDto userDto;
 
-    @Autowired
+    @InjectMocks
     private AssetsMapper assetsMapper;
 
-    @Autowired
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
     private CurrencyRepository currencyRepository;
 
-    @Autowired
+    @Mock
     private CryptocurrencyRepository cryptocurrencyRepository;
 
     @BeforeEach
     void setUp() {
         crypto = Cryptocurrency.builder()
+                .id(1L)
                 .symbol("testSymbol1")
                 .name("testName1")
                 .price(new BigDecimal("40"))
                 .build();
-        cryptocurrencyRepository.save(crypto);
         currency = Currency.builder()
+                .id(1L)
                 .symbol("USD")
                 .price(new BigDecimal("5"))
                 .build();
-        currencyRepository.save(currency);
         mainCurrency = Currency.builder()
                 .id(2L)
                 .symbol("USD")
                 .price(new BigDecimal("5"))
                 .build();
-        account = Account.builder()
+        userDto = UserDto.builder()
                 .id(1L)
-                .user(user)
-                .mainCurrency(mainCurrency)
-                .mainBalance(new BigDecimal("100"))
                 .build();
         user = User.builder()
                 .id(1L)
@@ -69,6 +73,12 @@ class AssetsMapperTestSuite {
                 .password("testPassword1")
                 .createdAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
+                .build();
+        account = Account.builder()
+                .id(1L)
+                .user(user)
+                .mainCurrency(mainCurrency)
+                .mainBalance(new BigDecimal("100"))
                 .build();
         user.setAccount(account);
     }
@@ -85,6 +95,8 @@ class AssetsMapperTestSuite {
                 .createdAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
+        when(userMapper.mapToUserDto(user)).thenReturn(userDto);
+        when(cryptocurrencyRepository.findBySymbol(crypto.getSymbol())).thenReturn(Optional.of(crypto));
         //when
         AssetDto assetDto = assetsMapper.mapToAssetDto(asset);
         //then
@@ -97,7 +109,6 @@ class AssetsMapperTestSuite {
         assertEquals(asset.getCreatedAt(), assetDto.getCreatedAt());
         assertEquals(asset.getUpdatedAt(), assetDto.getUpdatedAt());
         assertEquals(asset.getAmount().multiply(crypto.getPrice()).divide(mainCurrency.getPrice(), 2, RoundingMode.CEILING), assetDto.getCurrentValue());
-
     }
 
     @Test
@@ -112,6 +123,8 @@ class AssetsMapperTestSuite {
                 .createdAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
+        when(userMapper.mapToUserDto(user)).thenReturn(userDto);
+        when(currencyRepository.findBySymbol(currency.getSymbol())).thenReturn(Optional.of(currency));
         //when
         AssetDto assetDto = assetsMapper.mapToAssetDto(asset);
         //then
@@ -127,7 +140,7 @@ class AssetsMapperTestSuite {
     }
 
     @Test
-    void mapToAssetDtoList() {
+    void shouldMapToAssetDtoList() {
         //given
         Asset asset1 = Asset.builder()
                 .id(1L)
@@ -148,6 +161,9 @@ class AssetsMapperTestSuite {
                 .updatedAt(LocalDateTime.of(2020, 1, 1, 1, 1))
                 .build();
         List<Asset> assetList = List.of(asset1, asset2);
+        when(userMapper.mapToUserDto(user)).thenReturn(userDto);
+        when(currencyRepository.findBySymbol(currency.getSymbol())).thenReturn(Optional.of(currency));
+        when(cryptocurrencyRepository.findBySymbol(crypto.getSymbol())).thenReturn(Optional.of(crypto));
         //when
         List<AssetDto> assetDtoList = assetsMapper.mapToAssetDtoList(assetList);
         //then
@@ -157,6 +173,5 @@ class AssetsMapperTestSuite {
         assertEquals(asset1.getAssetType(), assetDtoList.getFirst().getAssetType());
         assertEquals(asset2.getId(), assetDtoList.getLast().getId());
         assertEquals(asset2.getAssetType(), assetDtoList.getLast().getAssetType());
-
     }
 }
