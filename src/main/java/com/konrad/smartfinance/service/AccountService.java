@@ -8,6 +8,8 @@ import com.konrad.smartfinance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -24,4 +26,23 @@ public class AccountService {
                 .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
         return user.getAccount();
     }
+
+    public BigDecimal getMainBalanceByUserId(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        return user.getAccount().getMainBalance();
+    }
+
+    public BigDecimal getAssetsBalanceByUserId(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        return user.getAccount().getAssetsBalance();
+    }
+
+    public BigDecimal getTotalBalanceByUserId(Long userId) throws UserException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
+        return user.getAccount().getMainBalance().add(user.getAccount().getAssetsBalance());
+    }
 }
+

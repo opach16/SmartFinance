@@ -26,13 +26,18 @@ public class AccountController {
         return ResponseEntity.ok(accountMapper.mapToAccountDto(accountService.getAccountByUserId(userId)));
     }
 
-    @GetMapping("/balance/{id}")
-    public ResponseEntity<BigDecimal> getBalance(@PathVariable Long id) {
-        return ResponseEntity.ok(BigDecimal.ZERO);
+    @GetMapping("/main-balance/{userId}")
+    public ResponseEntity<BigDecimal> getMainBalance(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(accountService.getMainBalanceByUserId(userId));
     }
 
-    @GetMapping("/total-balance/{id}")
-    public ResponseEntity<BigDecimal> getTotalBalance(@PathVariable Long id) {
-        return ResponseEntity.ok(BigDecimal.ZERO);
+    @GetMapping("/assets-balance/{userId}")
+    public ResponseEntity<BigDecimal> getAssetsBalance(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(accountService.getAssetsBalanceByUserId(userId));
+    }
+
+    @GetMapping("/total-balance/{userId}")
+    public ResponseEntity<BigDecimal> getTotalBalance(@PathVariable Long userId) throws UserException {
+        return ResponseEntity.ok(accountService.getTotalBalanceByUserId(userId));
     }
 }
