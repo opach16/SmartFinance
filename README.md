@@ -49,9 +49,9 @@ To run the application locally, ensure the following are installed on your syste
 
 1. **Clone the Repository**  
    ```
-   git clone <repository-url>
-   cd smartfinance
+   git clone https://github.com/opach16/SmartFinance.git
    ```
+   
 2. **Configure the Database**  
 Update the `application.properties` file with your PostgreSQL credentials:
 ```
@@ -59,6 +59,7 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/SmartFinanceDB
 spring.datasource.username=<your-database-username>
 spring.datasource.password=<your-database-password>
 ```
+
 3. **Add API Keys**  
 Include your API keys for CoinGecko and CurrencyAPI.com in the `application.properties` file:
 ```
@@ -66,19 +67,26 @@ coingecko.api.key=<your-coingecko-api-key>
 currencyapi.api.key=<your-currencyapi-key>
 ```
 
-5. **Build and Run the Backend**  
+4. **Build and Run the Backend**  
 Use Gradle to build and start the backend application:
 ```
 ./gradlew build
 ./gradlew bootRun
 ```
-5. **Run the Frontend**  
+
+5. **Clone the Frontend Repository**
+   ```
+   git clone https://github.com/opach16/SmartFinance_view.git
+   ```
+   
+6. **Run the Frontend**  
 Navigate to the Vaadin frontend directory and start the frontend application:
 ```
 ./gradlew build
 ./gradlew bootRun
 ```
-6. **Access the App**  
+
+7. **Access the App**  
 - **Frontend**: http://localhost:8081/
 - **API Documentation**: http://localhost:8080/swagger-ui/index.html
 
