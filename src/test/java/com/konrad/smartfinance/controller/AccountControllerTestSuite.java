@@ -43,7 +43,7 @@ class AccountControllerTestSuite {
         Account account = Account.builder()
                 .id(1L)
                 .build();
-        AccountDto accountDto = AccountDto.builder()
+        AccountDto accountDto = new AccountDto.Builder()
                 .id(1L)
                 .build();
         when(accountMapper.mapToAccountDto(account)).thenReturn(accountDto);
