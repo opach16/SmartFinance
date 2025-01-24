@@ -39,9 +39,7 @@ public class UserService {
     }
 
     public User addUser(User user, String mainCurrencySymbol, BigDecimal mainBalance) throws CurrencyExeption, UserException {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()){
-            throw new UserException("Username: " + user.getUsername() + " already exists");
-        }
+        validateUser(user);
         Currency mainCurrency = currencyService.getCurrencyBySymbol(mainCurrencySymbol);
         user.setPassword(bCrypt.encode(user.getPassword()));
         User fetchedUser = userRepository.save(user);
@@ -68,5 +66,23 @@ public class UserService {
         fetchedUser.setPassword("deleted" + fetchedUser.getId());
         fetchedUser.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         userRepository.save(fetchedUser);
+    }
+
+    private void validateUser(User user) throws UserException {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()){
+            throw new UserException("Username: " + user.getUsername() + " already exists");
+        }
+        if (user.getUsername().length() < 5) {
+            throw new UserException("Username must contain at least 4 characters");
+        }
+        if (user.getPassword().length() < 8) {
+            throw new UserException("Password must be at least 6 characters");
+        }
+        if (user.getEmail().length() < 5) {
+            throw new UserException("Email too short");
+        }
+        if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
+            throw new UserException("Invalid email");
+        }
     }
 }

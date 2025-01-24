@@ -49,13 +49,13 @@ class UserServiceTestSuite {
         user1 = User.builder()
                 .id(1L)
                 .username("testUsername1")
-                .email("testEmail1")
+                .email("testEmail1@test.com")
                 .password("testPassword1")
                 .build();
         user2 = User.builder()
                 .id(2L)
                 .username("testUsername2")
-                .email("testEmail2")
+                .email("testEmail2@test.com")
                 .password("testPassword2")
                 .build();
     }
@@ -157,6 +157,70 @@ class UserServiceTestSuite {
         when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
         //when & then
         assertThrows(UserException.class, () -> userService.addUser(user1, "testSymbol", BigDecimal.TEN));
+        verify(userRepository, never()).save(any(User.class));
+        verify(accountService, never()).createAccount(any(Account.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUsernameIsTooShortOnAddUser() {
+        //given
+        User user = User.builder()
+                .id(1L)
+                .username("test")
+                .email("testEmail@test.com")
+                .password("testPassword")
+                .build();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
+        //when & then
+        assertThrows(UserException.class, () -> userService.addUser(user, "testSymbol", BigDecimal.TEN));
+        verify(userRepository, never()).save(any(User.class));
+        verify(accountService, never()).createAccount(any(Account.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPasswordIsTooShortOnAddUser() {
+        //given
+        User user = User.builder()
+                .id(1L)
+                .username("testUsername")
+                .email("testEmail1@test.com")
+                .password("test")
+                .build();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
+        //when & then
+        assertThrows(UserException.class, () -> userService.addUser(user, "testSymbol", BigDecimal.TEN));
+        verify(userRepository, never()).save(any(User.class));
+        verify(accountService, never()).createAccount(any(Account.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEmailIsTooShortOnAddUser() {
+        //given
+        User user = User.builder()
+                .id(1L)
+                .username("testUsername")
+                .email("t@.t")
+                .password("testPassword")
+                .build();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
+        //when & then
+        assertThrows(UserException.class, () -> userService.addUser(user, "testSymbol", BigDecimal.TEN));
+        verify(userRepository, never()).save(any(User.class));
+        verify(accountService, never()).createAccount(any(Account.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenInvalidEmailOnAddUser() {
+        //given
+        User user = User.builder()
+                .id(1L)
+                .username("testUsername")
+                .email("testEmailtestcom")
+                .password("testPassword")
+                .build();
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
+        //when & then
+        assertThrows(UserException.class, () -> userService.addUser(user, "testSymbol", BigDecimal.TEN));
         verify(userRepository, never()).save(any(User.class));
         verify(accountService, never()).createAccount(any(Account.class));
     }
