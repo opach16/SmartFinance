@@ -167,11 +167,13 @@ public class CryptoTransactionService {
     private void logHighTransaction(CryptoTransaction transaction) {
         String username = transaction.getUser().getUsername();
         String symbol = transaction.getCryptocurrency().getSymbol();
-        String transactionValue = transaction.getAmount().multiply(transaction.getPrice()).toString();
-        if (transaction.getCryptoTransactionType() == CryptoTransactionType.BUY) {
-            logger.log(username + " bought " + transactionValue + " " + symbol);
-        } else if (transaction.getCryptoTransactionType() == CryptoTransactionType.SELL) {
-            logger.log(username + " sold " + transactionValue + " " + symbol);
+        BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
+        if (transactionValue.compareTo(BigDecimal.valueOf(100000)) >= 0) {
+            if (transaction.getCryptoTransactionType() == CryptoTransactionType.BUY) {
+                logger.log(username + " bought " + transactionValue + " " + symbol);
+            } else if (transaction.getCryptoTransactionType() == CryptoTransactionType.SELL) {
+                logger.log(username + " sold " + transactionValue + " " + symbol);
+            }
         }
     }
 }

@@ -166,11 +166,13 @@ public class CurrencyTransactionService {
     private void logHighTransaction(CurrencyTransaction transaction) {
         String username = transaction.getUser().getUsername();
         String symbol = transaction.getCurrency().getSymbol();
-        String transactionValue = transaction.getAmount().multiply(transaction.getPrice()).toString();
-        if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.BUY) {
-            logger.log(username + " bought " + transactionValue + " " + symbol);
-        } else if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.SELL) {
-            logger.log(username + " sold " + transactionValue + " " + symbol);
+        BigDecimal transactionValue = transaction.getAmount().multiply(transaction.getPrice());
+        if (transactionValue.compareTo(BigDecimal.valueOf(100000)) >= 0) {
+            if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.BUY) {
+                logger.log(username + " bought " + transactionValue + " " + symbol);
+            } else if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.SELL) {
+                logger.log(username + " sold " + transactionValue + " " + symbol);
+            }
         }
     }
 }
