@@ -1,5 +1,6 @@
 package com.konrad.smartfinance.service;
 
+import com.konrad.smartfinance.Logger;
 import com.konrad.smartfinance.domain.AssetType;
 import com.konrad.smartfinance.domain.CurrencyTransactionType;
 import com.konrad.smartfinance.domain.dto.CurrencyTransactionRequest;
@@ -23,6 +24,7 @@ public class CurrencyTransactionService {
     private final AccountRepository accountRepository;
     private final AssetsService assetsService;
     private final AssetRepository assetRepository;
+    private final Logger logger = Logger.getInstance();
 
     public List<CurrencyTransaction> getAllTransactions() {
         return currencyTransactionRepository.findAll();
@@ -56,6 +58,7 @@ public class CurrencyTransactionService {
         CurrencyTransaction savedTransaction = currencyTransactionRepository.save(transaction);
         updateAccountBalance(savedTransaction, true);
         updateAssets(savedTransaction, true);
+        logHighTransaction(transaction);
         return savedTransaction;
     }
 
@@ -157,6 +160,17 @@ public class CurrencyTransactionService {
             if (asset.getAmount().subtract(transaction.getAmount()).compareTo(request.getAmount()) < 0) {
                 throw new AssetException("Insufficient assets");
             }
+        }
+    }
+
+    private void logHighTransaction(CurrencyTransaction transaction) {
+        String username = transaction.getUser().getUsername();
+        String symbol = transaction.getCurrency().getSymbol();
+        String transactionValue = transaction.getAmount().multiply(transaction.getPrice()).toString();
+        if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.BUY) {
+            logger.log(username + " bought " + transactionValue + " " + symbol);
+        } else if (transaction.getCurrencyTransactionType() == CurrencyTransactionType.SELL) {
+            logger.log(username + " sold " + transactionValue + " " + symbol);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.konrad.smartfinance.service;
 
+import com.konrad.smartfinance.Logger;
 import com.konrad.smartfinance.domain.AssetType;
 import com.konrad.smartfinance.domain.CryptoTransactionType;
 import com.konrad.smartfinance.domain.dto.CryptoTransactionRequest;
@@ -23,6 +24,7 @@ public class CryptoTransactionService {
     private final AccountRepository accountRepository;
     private final AssetsService assetsService;
     private final AssetRepository assetRepository;
+    private final Logger logger = Logger.getInstance();
 
     public List<CryptoTransaction> getAllTransactions() {
         return cryptoTransactionRepository.findAll();
@@ -56,6 +58,7 @@ public class CryptoTransactionService {
         CryptoTransaction savedTransaction = cryptoTransactionRepository.save(transaction);
         updateAccountBalance(savedTransaction, true);
         updateAssets(savedTransaction, true);
+        logHighTransaction(savedTransaction);
         return savedTransaction;
     }
 
@@ -158,6 +161,17 @@ public class CryptoTransactionService {
             if (asset.getAmount().subtract(transaction.getAmount()).compareTo(request.getAmount()) < 0) {
                 throw new AssetException("Insufficient assets");
             }
+        }
+    }
+
+    private void logHighTransaction(CryptoTransaction transaction) {
+        String username = transaction.getUser().getUsername();
+        String symbol = transaction.getCryptocurrency().getSymbol();
+        String transactionValue = transaction.getAmount().multiply(transaction.getPrice()).toString();
+        if (transaction.getCryptoTransactionType() == CryptoTransactionType.BUY) {
+            logger.log(username + " bought " + transactionValue + " " + symbol);
+        } else if (transaction.getCryptoTransactionType() == CryptoTransactionType.SELL) {
+            logger.log(username + " sold " + transactionValue + " " + symbol);
         }
     }
 }
