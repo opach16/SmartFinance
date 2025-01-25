@@ -142,7 +142,7 @@ public class CurrencyTransactionService {
 
     private void verifyAssets(CurrencyTransactionRequest request) throws AssetException, UserException {
         if (request.getTransactionType() == CurrencyTransactionType.SELL) {
-            User user = userRepository.findById(request.getId())
+            User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new UserException(UserException.USER_NOT_FOUND));
             Asset asset = assetRepository.findByUserAndName(user, request.getCurrency())
                     .orElseThrow(() -> new AssetException(AssetException.NOT_FOUND));
