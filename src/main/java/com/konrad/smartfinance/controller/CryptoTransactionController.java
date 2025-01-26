@@ -26,7 +26,7 @@ public class CryptoTransactionController {
         return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionDtoList(cryptoTransactionService.getAllTransactions()));
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CryptoTransactionDto> getTransactionById(@PathVariable Long id) throws CryptoTransactionException {
         return ResponseEntity.ok().body(cryptoTransactionMapper
                 .mapToCryptoTransactionDto(cryptoTransactionService.getTransactionById(id)));
@@ -54,7 +54,7 @@ public class CryptoTransactionController {
         return ResponseEntity.ok().body(cryptoTransactionMapper.mapToCryptoTransactionRequest(transaction));
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public ResponseEntity<Void> deleteTransaction(@RequestParam Long transactionId) throws CryptoTransactionException, AccountException, AssetException {
         cryptoTransactionService.deleteTransaction(transactionId);
         return ResponseEntity.ok().build();
