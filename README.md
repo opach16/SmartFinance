@@ -96,3 +96,10 @@ Navigate to the Vaadin frontend directory and start the frontend application:
 For any questions or support, contact:
 - **Author**: Konrad
 - **Email**: [opach16@outlook.com]
+
+# Screenshots
+<img width="426" height="280" alt="Screenshot 2025-01-30 at 11 38 12" src="https://github.com/user-attachments/assets/e960739d-d94e-4006-bb9c-2da96f069ce2" />
+<img width="426" height="280" alt="Screenshot 2025-01-30 at 11 36 56" src="https://github.com/user-attachments/assets/33734752-a4d8-4317-9c8f-09d9e70aa50d" />
+<img width="426" height="280" alt="Screenshot 2025-01-30 at 11 36 46" src="https://github.com/user-attachments/assets/f482ce2f-2822-4b9c-a429-38741139f225" />
+<img width="426" height="280" alt="Screenshot 2025-01-30 at 11 37 14" src="https://github.com/user-attachments/assets/12f770c9-71fd-4fda-8778-25e6c300f0d8" />
+
